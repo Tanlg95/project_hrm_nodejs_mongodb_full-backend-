@@ -39,10 +39,16 @@ function castStringNumber(val)
     return val; 
 }
 
+function isnull(val,elseval)
+{
+    return (val === null) ? elseval : String(val);
+}
+
 
 module.exports = {
     castDate: castDate,
     checkNullValueTrim: checkNullValueTrim,
     checkNullValueTrimMysql: checkNullValueTrimMysql,
-    castStringNumber: castStringNumber
+    castStringNumber: castStringNumber,
+    isnull: isnull
 }
