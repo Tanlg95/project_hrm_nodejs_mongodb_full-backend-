@@ -97,6 +97,62 @@ function getValidateSchema (tblname,...checkExists){
                 }
             };
             break;
+        case "tblref_position":
+            validateSchema = {
+                $jsonSchema:{
+                    bsonType:"object",
+                    required:["posId","posName","note"],
+                    properties:{
+                        posId:{
+                            bsonType:["string"],
+                            maxLength:50,
+                            description:"posId must be string"
+                        },
+                        posName:{
+                            bsonType:["null","string"],
+                            maxLength:250,
+                            description:"posName must be string"
+                        },
+                        note:{
+                            bsonType:["null","string"],
+                            maxLength:250,
+                            description:"note must be string"
+                        }
+                    }
+                }
+            };
+            break;
+        case "tblemppos":
+            validateSchema = {
+                $jsonSchema:{
+                    bsonType:"object",
+                    required:["employeeId","dateChange","posId","note"],
+                    properties:{
+                        employeeId:{
+                            bsonType:"string",
+                            minLength: 5,
+                            maxLength: 30,
+                            description:"employeeId must be string"
+                        },
+                        dateChange:{
+                            bsonType:"date",
+                            description:"dateChange must be date"
+                        },
+                        posId:{
+                            bsonType:"string",
+                            maxLength: 50,
+                            enum: checkExists[0], // list position id validate
+                            description:"posId must be string"
+                        },
+                        note:{
+                            bsonType:["null","string"],
+                            maxLength: 250,
+                            description:"note must be string"
+                        },
+                    }
+                }
+            };
+            break;
 
     }
 

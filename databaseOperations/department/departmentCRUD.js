@@ -5,6 +5,7 @@ const functionSupport = require('../../other/supportFunction');
 const status = require("../../other/supportStatus").status;
 const objectIdmg = require('mongodb').ObjectId;
 const supportvalidateSchema = require('../../other/supportValidateSchema');
+const dbName = 'humanproject';
 
 /////////////////---------------- department structure -----------------------/////////////////////
 //#region 
@@ -23,7 +24,7 @@ async function createDepartmentStruct(body)
      // varible check real data ( exists in collection) or data from req
      let isrealDataExists = 0;
      if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
-     const db = connect.db('humanproject');
+     const db = connect.db(dbName);
      const collTblRefdepartment = db.collection(collName);
      // check data if exists
      let checkExists = await collTblRefdepartment.find({}).project({_id:0,depId:1, depTypeId: 1, depParent: 1}).toArray();
@@ -72,21 +73,15 @@ async function createDepartmentStruct(body)
         return false;
 
     });
-    // console.log(listSectionId);
-    // console.log(listLineId);
-    // console.log(listGroupId);
-    // console.log(listTeamId);
-    // console.log(listPartId);
-    
-      // console.log(checkExists);
      // mark isrealDataExists to 1 
         isrealDataExists = 1;
      }  
     //checkExists.push(null); // we need to push null value use for sectionId's deparent 
-    //console.log(checkExists.map(ele => ele.depId));
-    const checkExistsref_department = checkExists.map(ele => ele.depId);
+
+    // console.log(dataClientFilter);
+    const checkExistsref_department = [...checkExists].map(ele => ele.depId);
     checkExistsref_department.push(null);
-    // console.log(checkExistsref_department);
+
     //configure validate schema
     const validateSchema ={...supportvalidateSchema(collName,checkExistsref_department)}; 
     const setDepref = setDep;
@@ -117,8 +112,10 @@ async function createDepartmentStruct(body)
     try {
     await collTblRefdepartment.createIndexes([{key:{depId: 1}, name: "idx_tblref_department_depId"}]);
     //collTblRefdepartment.createIndex({depId: 1});
+    
     // when some data has already existed in collection then we need to filter the data which not exists in collection
     let dataClientFilter = [...checkExists];
+    
     if(isrealDataExists !== 0)
     {
         dataClientFilter = dataClientFilter.filter((ele) => (checkExistsForInsert.map(ele => ele.depId).includes(ele.depId))? false : true);
@@ -155,9 +152,11 @@ async function createDepartmentStruct(body)
 async function updateDepartmentStruct(body)
 {
     const connect = await mongodb.connect(connectString);
-    const db = connect.db('humanproject');
-    const collTblRefdepartment = db.collection('tblref_department');
-    const collTblempDep = db.collection('tblempdep');
+    const db = connect.db(dbName);
+    const tblref_department = 'tblref_department';
+    const tblempdep = 'tblempdep';
+    const collTblRefdepartment = db.collection(tblref_department);
+    const collTblempDep = db.collection(tblempdep);
     try {
     const dataClient = body.body;
     let totalRowsAffect = 0;    
@@ -186,9 +185,9 @@ async function updateDepartmentStruct(body)
         depTypeId = (depTypeId === 'T')? 'P' : (depTypeId === 'G')? 'T' : (depTypeId === 'L')? 'G' : (depTypeId === 'S')? 'L' : null;
         return ((depTypeId === ele.depTypeId) || (depTypeId === null && ele.depParent === null && ele.depTypeId === 'S'))? ele : false;
     });
-    
-    const dataClientFilter= dataClientTypeIdFilter.filter(ele => (mapListDep.some(eleInner => eleInner === ele.depId)));
-    const dataClientNotFilter = dataClientTypeIdFilter.filter(ele => (mapListDep.some(eleInner => eleInner === ele.depId)? false: true));
+
+    const dataClientFilter= [...dataClientTypeIdFilter].filter(ele => (mapListDep.some(eleInner => eleInner === ele.depId)));
+    const dataClientNotFilter = [...dataClientTypeIdFilter].filter(ele => (mapListDep.some(eleInner => eleInner === ele.depId)? false: true));
 
     for(let current of dataClientFilter)
     {
@@ -223,6 +222,27 @@ async function updateDepartmentStruct(body)
      const respone = await collTblRefdepartment.updateOne(filter,listDataUpdate);  
      totalRowsAffect += (respone.modifiedCount === 1)? 1 : 0;  
     }
+
+    let listdepartmentforValidate = [...listExistsTblref_department].filter(ele => (dataClientTypeIdFilter.map(eleInner => eleInner.depId)).includes(ele.depId)? false : true );
+    listdepartmentforValidate = (listdepartmentforValidate.concat(dataClientTypeIdFilter)).filter(ele => ([...listExistsTblref_department].map(eleInner => eleInner.depId)).includes(ele.depId));
+    const listdepartmentforValidateEmpdep = [...listdepartmentforValidate];
+    listdepartmentforValidate = listdepartmentforValidate.map(ele => ele.depId)
+    // console.log(listdepartmentforValidate);
+    listdepartmentforValidate.push(null);
+    const updateSchemaref_department = {...supportvalidateSchema(tblref_department,listdepartmentforValidate)};
+    const setDepempdep = setDep;
+   
+    const sectionId = setDepempdep('S',listdepartmentforValidateEmpdep),lineId = setDepempdep('L',listdepartmentforValidateEmpdep),groupId = setDepempdep('G',listdepartmentforValidateEmpdep),teamId = setDepempdep('T',listdepartmentforValidateEmpdep),partId = setDepempdep('P',listdepartmentforValidateEmpdep);
+    const updateSchemaTblempDep = {...supportvalidateSchema(tblempdep,[sectionId,lineId,groupId,teamId,partId])};
+
+    await db.command({
+        collMod: tblref_department,
+        validator: updateSchemaref_department
+    });
+    await db.command({
+        collMod: tblempdep,
+        validator: updateSchemaTblempDep
+    })
     
     return status(totalRowsAffect,1);
     } catch (error) {
@@ -240,10 +260,11 @@ async function updateDepartmentStruct(body)
 async function deleteDepartmentStruct(body)
 {
     const connect = await mongodb.connect(connectString);
-    const db = connect.db('humanproject');
+    const db = connect.db(dbName);
     const collName = "tblref_department";
+    const collEmpDep = "tblempdep";
     const collTblRefdepartment = db.collection(collName);
-    const collTblempDep = db.collection('tblempdep');
+    const collTblempDep = db.collection(collEmpDep);
     try {
     let dataClient = body.body;
     let totalRowsAffect = 0;
@@ -285,7 +306,10 @@ async function deleteDepartmentStruct(body)
     //console.log(mapListDep);
     
     if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
-    const dataClientFilter = dataClient.filter(ele => (mapListDep.some(eleInner => eleInner === ele.depId))? false: true );
+    let dataClientFilter = dataClient.filter(ele => (mapListDep.some(eleInner => eleInner === ele.depId))? false: true );
+    const getTblref_department = await collTblRefdepartment.find({}).project({_id:0, depId:1, depTypeId: 1,depParent : 1 }).toArray();
+    // can not remove depId which belong to deparent of other department
+    dataClientFilter = dataClientFilter.filter(ele => ([...getTblref_department].map(ele => ele.depParent)).includes(ele.depId)? false : true );
 
     if(dataClientFilter.length === 0) return status(0,2); 
     for(let ele of dataClientFilter) 
@@ -297,19 +321,19 @@ async function deleteDepartmentStruct(body)
         totalRowsAffect += (respone.deletedCount === 1)? 1 :0 ;
     }
 
-    const getTblref_department = await collTblRefdepartment.find({}).project({_id:0, depId:1, depTypeId: 1 }).toArray();
-    const mapdataref = getTblref_department.map(ele => ele.depId);
+    const mapdataref = ([...getTblref_department].filter(ele => dataClientFilter.includes(ele.depId)? false : true )).map(ele => ele.depId);
     const updateSchema = {...supportvalidateSchema(collName,mapdataref)};
     const setDepempdep = setDep;
-    const sectionId = setDepempdep('S',getTblref_department),lineId = setDepempdep('L',getTblref_department),groupId = setDepempdep('G',getTblref_department),teamId = setDepempdep('T',getTblref_department),partId = setDepempdep('P',getTblref_department);
-    const updateSchemaTblempDep = {...supportvalidateSchema('tblempdep',[sectionId,lineId,groupId,teamId,partId])};
+    const mapdataempdep = [...getTblref_department].filter(ele => dataClientFilter.includes(ele.depId)? false : true );
+    const sectionId = setDepempdep('S',mapdataempdep),lineId = setDepempdep('L',mapdataempdep),groupId = setDepempdep('G',mapdataempdep),teamId = setDepempdep('T',mapdataempdep),partId = setDepempdep('P',mapdataempdep);
+    const updateSchemaTblempDep = {...supportvalidateSchema(collEmpDep,[sectionId,lineId,groupId,teamId,partId])};
 
     await db.command({
         collMod: collName,
         validator: updateSchema
     });
     await db.command({
-        collMod: 'tblempdep',
+        collMod: collEmpDep,
         validator: updateSchemaTblempDep
     })
     return status(totalRowsAffect,2);
@@ -336,7 +360,7 @@ async function createEmployeeDepartment(body)
 {
     const connect = await mongodb.connect(connectString);
     const collName = 'tblempdep';
-    const db = connect.db('humanproject');
+    const db = connect.db(dbName);
     const collEmpDep = db.collection(collName),
           collref_dep = db.collection('tblref_department'),
           collEmployee = db.collection('tblemployee');
@@ -420,7 +444,7 @@ async function createEmployeeDepartment(body)
 async function updateEmployeeDepartment(body)
 {
     const connect = await mongodb.connect(connectString);
-    const db = connect.db('humanproject');
+    const db = connect.db(dbName);
     const collref_dep = db.collection('tblref_department');
     try {
     const dataClient = body.body;
@@ -474,7 +498,7 @@ async function deleteEmployeeDepartment(body)
         const dataForDelete = {
             _id: new objectIdmg(ele._id)
         }
-        const respone = await connect.db('humanproject').collection('tblempdep').deleteOne(dataForDelete);
+        const respone = await connect.db(dbName).collection('tblempdep').deleteOne(dataForDelete);
         totalRowsAffect -= (respone.deletedCount === 0)? 1 :0 ;
     }
     return status(totalRowsAffect,2);

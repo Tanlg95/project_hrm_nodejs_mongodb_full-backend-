@@ -1,13 +1,15 @@
 const mongodb = require('mongodb').MongoClient;
 const connectString = require('../../databaseConnections/mongoDbConnection');
 const supportFunction = require('../../other/supportFunction');
-
+const dbName = "humanproject";
 
 async function ufnGetMaxDep(todate)
 {
     const connect = await mongodb.connect(connectString);
-    const db = connect.db('humanproject');
+    const db = connect.db(dbName);
     try {
+        // old jsonSchema
+        //#region 
         // const getListEmpDep = await db.collection('tblempdep').aggregate([
         //     {
         //       '$match': {
@@ -198,6 +200,8 @@ async function ufnGetMaxDep(todate)
         //     }
         // }
         // filter list employee department with max datechange
+        //#endregion
+        
         const getListEmpDep = await db.collection('tblempdep').aggregate([
             {
               '$match': {
@@ -252,7 +256,7 @@ async function ufnGetMaxDep(todate)
         console.log(error);
         //throw error;
     }finally{
-        connect.close();
+        await connect.close();
     }
 };
 
@@ -261,7 +265,7 @@ async function ufnGetMaxDep(todate)
 async function changeDepHistory(fromdate,todate){
     
     const connect = await mongodb.connect(connectString);
-    const db = connect.db('humanproject');
+    const db = connect.db(dbName);
     try {
         const getListHistoryDepChange = await db.collection('tblempdep').aggregate([
             {
@@ -772,7 +776,7 @@ async function changeDepHistory(fromdate,todate){
         console.log(error);
         throw error;
     } finally{
-        connect.close();
+        await connect.close();
     }
 }
 module.exports = {
