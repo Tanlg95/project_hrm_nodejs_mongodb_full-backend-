@@ -2,6 +2,8 @@ const connectString = require('../../databaseConnections/mongoDbConnection');
 const mongodb = require('mongodb').MongoClient;
 const functionSupport = require('../../other/supportFunction');
 const status = require("../../other/supportStatus").status;
+const validateSupport = require('../../other/supportValidateSchema');
+const dbName = 'humanproject';
 
 
 //----------------------------- get employee information--------------------------------// begin
@@ -30,12 +32,26 @@ async function getemployee(empid)
 async function createEmployee(body)
 {
     const connect = await mongodb.connect(connectString);
-    const coll = connect.db('humanproject').collection('tblemployee');
+    const tblname_employee = 'tblemployee';
+    const db = connect.db(dbName);
+
+    const validateSchema = {...validateSupport(tblname_employee,null)};
+    try {
+    await db.createCollection(tblname_employee,{
+        validator: validateSchema
+    });
+    } catch (error) {
+    await db.command({
+        collMod: tblname_employee,
+        validator: validateSchema
+    });  
+    }
     try {
     const dataClient = body.body;    
     if(!(dataClient instanceof Array)) throw new Error('data must be an array!!!');
     // check data if exists
-    const checkExists = await coll.find({}).toArray();
+    const collEmployee = db.collection(tblname_employee);
+    const checkExists = await collEmployee.find({}).toArray();
     let listDateForInsert = dataClient.filter((ele) => (checkExists.findIndex(eleInner => eleInner.employeeId === ele.employeeId) === -1)? true : false);
     if(listDateForInsert.length === 0) return status(0,0);
     const dataForInsert = listDateForInsert.reduce((value,current) => {
@@ -56,7 +72,7 @@ async function createEmployee(body)
         })
         return value;
     },[]);
-    const listemployee = await coll.insertMany(dataForInsert);
+    const listemployee = await collEmployee.insertMany(dataForInsert);
     return listemployee;
     } catch (error) {
         //console.log(error);

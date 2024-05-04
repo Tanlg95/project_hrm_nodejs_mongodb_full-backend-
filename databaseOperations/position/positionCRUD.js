@@ -23,9 +23,8 @@ async function createpositionStruct(body)
     // check data if exists
     const checkExists = await collref_position.find({}).project({_id:0}).toArray();
     //const checkExistsEmppos = await colltblemppos.find({}).project({_id:0,posId:1}).toArray();
-
     const checkExistsMap = [...checkExists].map(ele => ele.posId);
-    const dataClient = body.body;    
+    const dataClient = body.body;
     if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
     let listDataForInsert = dataClient.filter((ele) => (checkExistsMap.includes(ele.posId))? false : true);
     
@@ -163,7 +162,6 @@ async function deletepositionStruct(body)
         collMod: tblemppos,
         validator: validateSchemaempPos
     });
-
     try {
     if(dataClientFilter.length === 0) return status(0,2);
     for(let ele of dataClientFilter)
@@ -210,14 +208,14 @@ async function createEmployeeposition(body)
         });
     } catch (error) {
         //console.log(error);
-        db.command({
+        await db.command({
             collMod: tblemppos,
             validator: validateSchema
         })
     };
     
     try {
-    const dataClient = body.body;    
+    const dataClient = body.body;
     if(!(dataClient instanceof Array)) throw new Error(`data must be an array!!!!`);
     // check data if exists
     const checkExists = await coll.find({}).toArray();
@@ -266,6 +264,12 @@ async function createEmployeeposition(body)
 async function updateEmployeeposition(body)
 {
     const connect = await mongodb.connect(connectString);
+    const db = connect.db(dbName);
+    const collEmpPos = db.collection('tblemppos');
+    const collEmployee = db.collection('tblemployee');
+    const getlistEmpPos = await collEmpPos.find({}).project({_id: 0, employeeId: 1, posId: 1, dateChange: 1}).toArray();
+    const listEmployeeIdInDB = await collEmployee.find({}).project({_id:0, employeeId:1}).toArray();
+    const listEmployeeIdInDBMap = listEmployeeIdInDB.map(ele => ele.employeeId);
     try {
     const dataClient = body.body;
     if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
@@ -280,19 +284,29 @@ async function updateEmployeeposition(body)
     //     }
     //     return (isNotMatched === 0)? true: false;
     // });
+    // check duplicate data
+    let listDataForInsert = dataClient.filter((ele) => (getlistEmpPos.some(
+        eleInner => eleInner.employeeId === ele.employeeId && 
+        functionSupport.castDate(eleInner.dateChange,1) === functionSupport.castDate(ele.dateChange,1) &&
+        eleInner.posId === ele.posId
+        ) === true)? false : true);
+    // check valid employeeId
+    listDataForInsert = listDataForInsert.filter(ele => listEmployeeIdInDBMap.includes(ele.employeeId));
+
     let totalRowsAffect = 0;    
-    for(let current of dataClient)
+    for(let current of listDataForInsert)
     {
      const filter = {'_id' : new objectIdmg(current._id)};
      const listDataUpdate = 
         {   
         $set:{
+            employeeId: current.employeeId,
             dateChange: new Date(current.dateChange),
             posId: current.posId,
             note: current.note
         }
         };
-    const respone = await connect.db(dbName).collection('tblemppos').updateOne(filter,listDataUpdate);
+    const respone = await collEmpPos.updateOne(filter,listDataUpdate);
     totalRowsAffect += (respone.modifiedCount === 1)? 1 : 0;
     console.log(totalRowsAffect);
     }
