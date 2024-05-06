@@ -4,7 +4,7 @@ const functionSupport = require('../../other/supportFunction');
 const status = require("../../other/supportStatus").status;
 const validateSupport = require('../../other/supportValidateSchema');
 const dbName = 'humanproject';
-
+const statusRequest = require('../../other/supportStatus').statusRequest;
 
 //----------------------------- get employee information--------------------------------// begin
 //#region 
@@ -48,7 +48,7 @@ async function createEmployee(body)
     }
     try {
     const dataClient = body.body;    
-    if(!(dataClient instanceof Array)) throw new Error('data must be an array!!!');
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
     // check data if exists
     const collEmployee = db.collection(tblname_employee);
     const checkExists = await collEmployee.find({}).toArray();
@@ -92,7 +92,7 @@ async function updateEmployee(body)
     try {
     const dataClient = body.body;
     let totalRowsAffect = body.body.length;    
-    if(!(dataClient instanceof Array)) throw new Error('data must be an array!!!');
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
     for(let current of dataClient)
     {
      const filter = {'employeeId':  current.employeeId};
@@ -135,7 +135,7 @@ async function deleteEmployee(body)
     try {
     const dataClient = body.body;
     let totalRowsAffect = dataClient.length;
-    if(!(dataClient instanceof Array)) throw new Error('data must be an array!!!');
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
     for(let ele of dataClient)
     {
         const dataForDelete = {

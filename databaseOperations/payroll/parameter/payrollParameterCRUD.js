@@ -9,6 +9,7 @@ const validateSupport = require('../../../other/supportValidateSchema');
 // const momentJS = require('moment');
 // const { castDate } = require('../../../other/supportFunction');
 const dbName = "humanproject";
+const statusRequest = require('../../../other/supportStatus').statusRequest;
 
 
 //----------------------------- create parameter --------------------------------// begin
@@ -36,7 +37,7 @@ async function createparameter(body)
     }
     try {
     const dataClient = body.body;
-    if(!(dataClient instanceof Array)) throw Error('dataClient must be an Array!!!');
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
     let dataClientFilter = dataClient.filter(ele => (getListparameter.includes(ele.paraId)) ? false : true );
 
     if(dataClientFilter.length === 0) return status(0,0);
@@ -73,7 +74,7 @@ async function updateparameter(body)
     const getListparameter = await coll_parameter.distinct("paraId");
     try {
     const dataClient = body.body;
-    if(!(dataClient instanceof Array)) throw Error('dataClient must be an Array!!!');
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
     const dataClientFilter = dataClient.filter(ele => (getListparameter.includes(ele.paraId) === true) ? true : false)
     let totalRowsAffect = 0;
     for(let ele of dataClientFilter )
@@ -112,7 +113,7 @@ async function deleteparameter(body)
     //const getListparameter = await coll_parameter.find({}).project({_id:0, monthId: 1, yearId: 1, employeeId: 1}).toArray();
     try {
     const dataClient = body.body;
-    if(!(dataClient instanceof Array)) throw Error('dataClient must be an Array!!!');
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
     let totalRowsAffect = 0;
     for(let ele of dataClient )
     {

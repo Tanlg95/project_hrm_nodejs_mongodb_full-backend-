@@ -12,7 +12,6 @@ const dbName = "humanproject";
 
 // get parameter for cal
 const getListParameter = require('../parameter/payrollParameterFunction').getListparameter;
-
 // caculate payroll 
 
 async function callPayroll(monthid,yearid,employeeid)
@@ -303,10 +302,9 @@ async function callPayroll(monthid,yearid,employeeid)
           },
         },
       ]).toArray();
-    
-    
+
     // list employeeId
-    const listEmployeeId = [...getListEmployeeForCal].map(ele => ele.employeeId);
+    const listEmployeeId = (employeeid !== '')? ([...getListEmployeeForCal].map(ele => ele.employeeId)).filter(employeeidv => employeeidv === employeeid ) : [...getListEmployeeForCal].map(ele => ele.employeeId);
     // get list totalWDSal
     const getListTotalWDsalary = await calTotalWD(monthid,yearid,listEmployeeId);
     // get list insurance
@@ -487,6 +485,29 @@ function getCurrentWD(yearid, monthid)
   return currentWD - totalSat;
 }
 
+// get parameter
+async function getPara(paraId)
+{
+    // paraId === '*' => get all parameter
+    // get payroll's parameter
+    const para = await getListParameter();
+    const listPara = [...para].map(ele => ({paraId: ele.paraId, value: ele.value}));
+    let result = undefined;
+    if(paraId === '*')
+    {
+      result = [...listPara];
+    }
+    else{
+      result = (([...listPara].filter(para => para.paraId === paraId)).length === 1)? (listPara.filter(para => para.paraId === paraId))[0].value : null;
+    }
+    return result;
+}
+// filter parameter 
+function filterPara(listPara,paraId)
+{
+   return (([...listPara].filter(para => para.paraId === paraId)).length === 1)? (listPara.filter(para => para.paraId === paraId))[0].value : null;
+}
+
 // algorithm cal taxable
 
 function calTaxAg(totalSalaryTax)
@@ -529,10 +550,8 @@ function calTaxAg(totalSalaryTax)
 // algorithm cal total WD salary
 async function calWDSalAg(WD,WN, basicSalary, yearid, monthid)
 {
-  // get payroll's parameter
-  const para = await getListParameter();
-  const thisPara = [...para];
-  const WDinMonth = (thisPara.filter(ele => ele.paraId === 'CCT'))[0].value;
+  // get default workday in month
+  const WDinMonth = await getPara('CCT');
   // get current wd in this month
   const CurrentWD = getCurrentWD(yearid,monthid);
   try {
@@ -562,18 +581,17 @@ async function calWDSalAg(WD,WN, basicSalary, yearid, monthid)
 
 async function calOTSalAg(basicSalary , yearid, monthid, ...listOT)
 {
-  // get payroll's parameter
-  const para = await getListParameter();
-  const thisPara = [...para];
-  const WDinMonth = (thisPara.filter(ele => ele.paraId === 'CCT'))[0].value;
+  // get default workday in month
+  const WDinMonth = await getPara('CCT');
   // get rare OT
+  const OTr = await getPara('*');
   const OTrare ={
-    OT15: (thisPara.filter(ele => ele.paraId === 'OT15'))[0].value,
-    OT20: (thisPara.filter(ele => ele.paraId === 'OT20'))[0].value,
-    OT30: (thisPara.filter(ele => ele.paraId === 'OT30'))[0].value,
-    OT15N: (thisPara.filter(ele => ele.paraId === 'OT15N'))[0].value,
-    OT20N: (thisPara.filter(ele => ele.paraId === 'OT20N'))[0].value,
-    OT30N: (thisPara.filter(ele => ele.paraId === 'OT30N'))[0].value
+    OT15: filterPara(OTr,'OT15'),
+    OT20: filterPara(OTr,'OT20'),
+    OT30: filterPara(OTr,'OT30'),
+    OT15N: filterPara(OTr,'OT15N'),
+    OT20N: filterPara(OTr,'OT20N'),
+    OT30N: filterPara(OTr,'OT30N')
   } ;
   // get current wd in this month
   const CurrentWD = getCurrentWD(yearid,monthid);
@@ -612,10 +630,8 @@ async function calOTSalAg(basicSalary , yearid, monthid, ...listOT)
 
 async function calLeaveSalAg(basicSalary , yearid, monthid, ...listLeave)
 {
-  // get payroll's parameter
-  const para = await getListParameter();
-  const thisPara = [...para];
-  const WDinMonth = (thisPara.filter(ele => ele.paraId === 'CCT'))[0].value;
+  // get default workday in month
+  const WDinMonth = await getPara('CCT');
   // get current wd in this month
   const CurrentWD = getCurrentWD(yearid,monthid);
   try {
@@ -644,23 +660,17 @@ async function calLeaveSalAg(basicSalary , yearid, monthid, ...listLeave)
 
 async function calInsAg(basicSalary , yearid, monthid)
 {
-  // get payroll's parameter
-  const para = await getListParameter();
-  const thisPara = [...para].map(ele => ({paraId: ele.paraId, value: ele.value}));
-  const WDinMonth = getPara(thisPara,'CCT');
-  function getPara (listPara,paraId)
-  {
-      const result = ((listPara.filter(para => para.paraId === paraId)).length === 1)? (listPara.filter(para => para.paraId === paraId))[0].value : null;
-      return result;
-  }
+  // get default workday in month
+  const WDinMonth = await getPara('CCT');
   // get para for insurance
+  const Insrare = await getPara('*');
   const insuranceRare = {
-    SI_emp: getPara(thisPara,'SI_race_emp'),
-    HI_emp: getPara(thisPara,'HI_race_emp'),
-    UI_emp: getPara(thisPara,'UI_race_emp'),
-    SI_comp: getPara(thisPara,'SI_race_comp'),
-    HI_comp: getPara(thisPara,'HI_race_comp'),
-    UI_comp: getPara(thisPara,'UI_race_comp')
+    SI_emp: filterPara(Insrare,'SI_race_emp'),
+    HI_emp: filterPara(Insrare,'HI_race_emp'),
+    UI_emp: filterPara(Insrare,'UI_race_emp'),
+    SI_comp: filterPara(Insrare,'SI_race_comp'),
+    HI_comp: filterPara(Insrare,'HI_race_comp'),
+    UI_comp: filterPara(Insrare,'UI_race_comp')
   }
   // get current wd in this month
   const CurrentWD = getCurrentWD(yearid,monthid);
@@ -828,7 +838,7 @@ async function calTotalWD(monthid, yearid, listEmployeeForCal)
       
       const OTSal = await alg.OTSal(basicSalary,yearid,monthid,[ele.OT15,ele.OT20,ele.OT30,ele.OT15N,ele.OT20N,ele.OT30N]);
       const WDSal = await alg.WDSal(ele.WD,ele.WN,basicSalary,yearid,monthid);
-
+      // workday, overtime, leave
       employeeTotalWD.WD = (!Number(ele.WD))? 0 : ele.WD;
       employeeTotalWD.WN = (!Number(ele.WN))? 0 : ele.WN;
       employeeTotalWD.AL = (!Number(ele.AL))? 0: ele.AL;
@@ -1015,7 +1025,7 @@ async function calInsurance(monthid, yearid, listEmployeeForCal)
             return value;
         }
       ,0);
-      console.log(basicSalary);
+      //console.log(basicSalary);
       const insurance = await calInsAg(basicSalary,yearid,monthid);
       let employeeInsurance ={
          employeeId: employeeId,
@@ -1038,6 +1048,43 @@ async function calInsurance(monthid, yearid, listEmployeeForCal)
 }
 
 
+// get payroll
+
+async function getPayroll(yearid,monthid,employeeid)
+{
+   const connect = await mongodb.connect(connectString);
+   const db = connect.db(dbName);
+   const tblpayroll = 'tblpayroll';
+   const coll_payroll = db.collection(tblpayroll);
+   try {
+   const getListpayroll = await coll_payroll.aggregate([
+      {
+        $match:{
+          $expr:{
+            $and:[
+                {$eq:["$yearId",Number(yearid)]},
+                (monthid === '*')?'' : {$eq:["$monthId",Number(monthid)]},
+                (employeeid === '*')?'' : {$eq:["$employeeId",employeeid]}
+            ]
+          }
+        }
+      },
+      {
+        $project:{
+          _id: 0
+        }
+      }
+   ]).toArray();
+   return getListpayroll;
+   } catch (error) {
+   console.log(error);
+   throw error;
+   } finally{
+   await connect.close();
+   }
+}
+
 module.exports = {
-    callPayroll: callPayroll
+    callPayroll: callPayroll,
+    getPayroll: getPayroll
 };

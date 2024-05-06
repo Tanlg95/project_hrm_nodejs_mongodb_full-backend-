@@ -8,6 +8,7 @@ const objectIdmg = require('mongodb').ObjectId;
 const validateSupport = require('../../other/supportValidateSchema');
 const momentJS = require('moment');
 const dbName = "humanproject";
+const statusRequest = require('../../other/supportStatus').statusRequest;
 
 
 //----------------------------- create totalWD --------------------------------// begin
@@ -35,7 +36,7 @@ async function createTotalWD(body)
     }
     try {
     const dataClient = body.body;
-    if(!(dataClient instanceof Array)) throw Error('dataClient must be an Array!!!');
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
     let dataClientFilter = dataClient.filter((ele) => (
         getListTotalWD.some(eleInner =>
             eleInner.employeeId === ele.employeeId &&
@@ -89,7 +90,7 @@ async function updateTotalWD(body)
     //const getListTotalWD = await coll_totalWD.find({}).project({_id:0, monthId: 1, yearId: 1, employeeId: 1}).toArray();
     try {
     const dataClient = body.body;
-    if(!(dataClient instanceof Array)) throw Error('dataClient must be an Array!!!');
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
     let totalRowsAffect = 0;
     for(let ele of dataClient )
     {
@@ -141,7 +142,7 @@ async function deleteTotalWD(body)
     //const getListTotalWD = await coll_totalWD.find({}).project({_id:0, monthId: 1, yearId: 1, employeeId: 1}).toArray();
     try {
     const dataClient = body.body;
-    if(!(dataClient instanceof Array)) throw Error('dataClient must be an Array!!!');
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
     let totalRowsAffect = 0;
     for(let ele of dataClient )
     {

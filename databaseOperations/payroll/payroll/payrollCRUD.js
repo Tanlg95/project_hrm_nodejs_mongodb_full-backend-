@@ -9,6 +9,7 @@ const validateSupport = require('../../../other/supportValidateSchema');
 const momentJS = require('moment');
 const { castDate } = require('../../../other/supportFunction');
 const dbName = "humanproject";
+const statusRequest = require('../../../other/supportStatus').statusRequest;
 
 
 //----------------------------- create payroll --------------------------------// begin
@@ -36,7 +37,7 @@ async function createpayroll(body)
     }
     try {
     const dataClient = body.body;
-    if(!(dataClient instanceof Array)) throw Error('dataClient must be an Array!!!');
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
     let dataClientFilter = dataClient.filter((ele) => (
         getListpayroll.some(eleInner =>
             eleInner.employeeId === ele.employeeId &&
@@ -148,7 +149,7 @@ async function updatepayroll(body)
     //const getListpayroll = await coll_payroll.find({}).project({_id:0, monthId: 1, yearId: 1, employeeId: 1}).toArray();
     try {
     const dataClient = body.body;
-    if(!(dataClient instanceof Array)) throw Error('dataClient must be an Array!!!');
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
     let totalRowsAffect = 0;
     for(let ele of dataClient )
     {
@@ -258,7 +259,7 @@ async function deletepayroll(body)
     //const getListpayroll = await coll_payroll.find({}).project({_id:0, monthId: 1, yearId: 1, employeeId: 1}).toArray();
     try {
     const dataClient = body.body;
-    if(!(dataClient instanceof Array)) throw Error('dataClient must be an Array!!!');
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
     let totalRowsAffect = 0;
     for(let ele of dataClient )
     {

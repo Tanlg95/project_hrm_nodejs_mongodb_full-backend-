@@ -9,6 +9,7 @@ const momentJS = require('moment');
 const employeeCRUD = require('../../masterData/employeeCRUD');
 const { Double } = require('mongodb');
 const dbName = "humanproject";
+const statusRequest = require('../../../other/supportStatus').statusRequest;
 
 /////////////////---------------- AddDeduct structure -----------------------/////////////////////
 //#region 
@@ -28,7 +29,7 @@ async function createAddDeductStruct(body)
     const checkExists = await collref_AddDeduct.distinct("addDeductId");
 
     const dataClient = body.body;
-    if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     let listDataForInsert = dataClient.filter((ele) => (checkExists.includes(ele.addDeductId))? false : true);
     const listDataForvalidateEmpAddDeduct = ([...listDataForInsert].map(eleInner => eleInner.addDeductId)).concat(checkExists);
     try {
@@ -94,7 +95,7 @@ async function updateAddDeductStruct(body)
     try {
     const dataClient = body.body;
     let totalRowsAffect = 0;    
-    if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     //const getListEmpAddDeduct = await colltblempAddDeduct.distinct("allownaceId");
     // can not update isFix and isTax document which's using by employee
     //const dataClientFilter = dataClient.filter(ele => getListEmpAddDeduct.includes(ele.addDeductId));
@@ -140,7 +141,7 @@ async function deleteAddDeductStruct(body)
     try {
     const dataClient = body.body;
     let totalRowsAffect = 0;    
-    if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     const getlistref_AddDeduct = await collref_AddDeduct.distinct("addDeductId");
     const getListEmpAddDeduct = await colltblempAddDeduct.distinct("addDeductId");
 
@@ -217,7 +218,7 @@ async function createEmployeeAddDeduct(body)
     
     try {
     const dataClient = body.body;
-    if(!(dataClient instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
 
     const listEmployeeIdInDB = await colltblemployee.distinct("employeeId");
     const getListEmpAddDeduct = await colltblempAddDeduct.find({}).project({_id: 0, employeeId: 1, dateChange: 1}).toArray();
@@ -270,7 +271,7 @@ async function updateEmployeeAddDeduct(body)
     
     try {
     const dataClient = body.body;
-    if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     // get list ref AddDeduct
     const getlistref_AddDeduct = await collref_AddDeduct.distinct("addDeductId");
     // get list employee AddDeduct
@@ -329,7 +330,7 @@ async function deleteEmployeeAddDeduct(body)
     try {
     const dataClient = body.body;
     let totalRowsAffect = 0;
-    if(!(dataClient instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
     for(let ele of dataClient)
     {
         const dataForDelete = {

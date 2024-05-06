@@ -9,6 +9,7 @@ const momentJS = require('moment');
 const employeeCRUD = require('../../masterData/employeeCRUD');
 const { Double } = require('mongodb');
 const dbName = "humanproject";
+const statusRequest = require('../../../other/supportStatus').statusRequest;
 
 
 /////////////////---------------- employee's allowanceFix -----------------------/////////////////////
@@ -43,7 +44,7 @@ async function createEmployeeallowanceFix(body)
     
     try {
     const dataClient = body.body;
-    if(!(dataClient instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
 
     const listEmployeeIdInDB = await colltblemployee.find().project({employeeId:1}).toArray();
     const getListEmpallowanceFix = await colltblempallowanceFix.find({}).project({_id: 0, employeeId: 1, dateChange: 1}).toArray();
@@ -93,7 +94,7 @@ async function updateEmployeeallowanceFix(body)
     
     try {
     const dataClient = body.body;
-    if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     // get list ref allowanceFix
     const getlistref_allowanceFix = await collref_allowanceFix.distinct("allowanceId",{IsFix: true});
     // get list employee allowanceFix
@@ -149,7 +150,7 @@ async function deleteEmployeeallowanceFix(body)
     try {
     const dataClient = body.body;
     let totalRowsAffect = 0;
-    if(!(dataClient instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
     for(let ele of dataClient)
     {
         const dataForDelete = {

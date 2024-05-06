@@ -6,6 +6,7 @@ const status = require("../../other/supportStatus").status;
 const objectIdmg = require('mongodb').ObjectId;
 const validateSupport = require('../../other/supportValidateSchema');
 const dbName = "humanproject";
+const statusRequest = require('../../other/supportStatus').statusRequest;
 
 /////////////////---------------- position structure -----------------------/////////////////////
 //#region 
@@ -25,7 +26,7 @@ async function createpositionStruct(body)
     //const checkExistsEmppos = await colltblemppos.find({}).project({_id:0,posId:1}).toArray();
     const checkExistsMap = [...checkExists].map(ele => ele.posId);
     const dataClient = body.body;
-    if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     let listDataForInsert = dataClient.filter((ele) => (checkExistsMap.includes(ele.posId))? false : true);
     
     const listDataForvalidateEmppos = ([...listDataForInsert].map(ele => ele.posId)).concat(checkExistsMap);
@@ -90,7 +91,7 @@ async function updatepositionStruct(body)
     try {
     const dataClient = body.body;
     let totalRowsAffect = 0;    
-    if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     //const dataClientFilter = [...dataClient].filter(ele => getListEmpPos.includes(ele.posId)? false: true);
     //const dataClientFilteUpdateAll = [...dataClient].filter(ele => ([...dataClientFilter].map(eleInner => eleInner.posId)).includes(ele.posId)? false: true);
 
@@ -151,7 +152,7 @@ async function deletepositionStruct(body)
     const getListEmpPosMap = [...getListEmpPos].map(ele => ele.posId);
     const dataClient = body.body;
     let totalRowsAffect = 0;
-    if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     const dataClientFilter = ([...dataClient].filter(ele => getListEmpPosMap.includes(ele.posId)? false : true)).
     filter(eleInner => ([...getlistref_pos].map(eleInner2 => eleInner2.posId)).includes(eleInner.posId));
 
@@ -216,7 +217,7 @@ async function createEmployeeposition(body)
     
     try {
     const dataClient = body.body;
-    if(!(dataClient instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
     // check data if exists
     const checkExists = await coll.find({}).toArray();
     const listEmployeeIdInDB = await db.collection('tblemployee').find().project({employeeId:1}).toArray();
@@ -272,7 +273,7 @@ async function updateEmployeeposition(body)
     const listEmployeeIdInDBMap = listEmployeeIdInDB.map(ele => ele.employeeId);
     try {
     const dataClient = body.body;
-    if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     // const listPosIdInDB = await connect.db(dbName).collection('tblref_position').find().project({_id:0,depId:1}).toArray();
     // const dataClientFilter = dataClient.filter(ele => {
     //     let isNotMatched = 0;
@@ -329,7 +330,7 @@ async function deleteEmployeeposition(body)
     try {
     const dataClient = body.body;
     let totalRowsAffect = 0;
-    if(!(dataClient instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
     for(let ele of dataClient)
     {
         const dataForDelete = {

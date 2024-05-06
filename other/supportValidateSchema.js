@@ -885,6 +885,47 @@ function getValidateSchema (tblname,...checkExists){
             }
         };
         break;
+    case "tblaccount":
+        validateSchema = {
+            $jsonSchema: {
+                bsonType: "object",
+                required: ["accountId","accountName","email","pwd","atoken","rtoken","note"],
+                properties:{
+                    accountId:{
+                        bsonType: "string",
+                        maxLength: 30,
+                        description: "accountId must be string"
+                    },
+                    accountName:{
+                        bsonType: "string",
+                        maxLength: 250,
+                        description: "accountName must be string"
+                    },
+                    email:{
+                        bsonType: ["null","string"],
+                        maxLength: 150,
+                        description: "email must be string"
+                    },
+                    pwd:{
+                        bsonType: "string",
+                        description: "password must be string"
+                    },
+                    atoken:{
+                        bsonType: "string",
+                        description: "atoken must be string"
+                    },
+                    rtoken:{
+                        bsonType: "string",
+                        description: "rtoken must be string"
+                    },
+                    note:{
+                        bsonType: ["null","string"],
+                        description: "note must be string"
+                    }
+                }
+            }
+        }
+        break;
     }
     return validateSchema;
 }

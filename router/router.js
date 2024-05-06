@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+
+const authToken = require('../databaseOperations/login/token/tokenFunction').authToken;
+
 const employeeCRUD = require('../databaseOperations/masterData/employeeCRUD');
 const departmentCRUD = require('../databaseOperations/department/departmentCRUD');
 const departmentFunction = require('../databaseOperations/department/departmentFunction');
@@ -23,6 +26,9 @@ const payrollCRUD = require('../databaseOperations/payroll/payroll/payrollCRUD')
 const payrollFunction = require('../databaseOperations/payroll/payroll/payrollFunction');
 const parameterCRUD = require('../databaseOperations/payroll/parameter/payrollParameterCRUD');
 const parameterFunction = require('../databaseOperations/payroll/parameter/payrollParameterFunction');
+const accountCRUD = require('../databaseOperations/login/account/accountCRUD');
+const accountFunction = require('../databaseOperations/login/account/accountFunction');
+
 
 //---------------------- employee's router ------------------------// begin
 //#region 
@@ -734,7 +740,7 @@ router.post('/deleteEmployeeaddDeduct',(req,res,next) =>{
 
 // get max addDeduct
 
-router.get('/getmaxaddDeduct/:todate/:adopt',(req,res,next) =>{
+router.get('/getmaxaddDeduct/:todate/:adopt',authToken,(req,res,next) =>{
     const todate = req.params.todate, adopt = req.params.adopt;
     addDeductFunction.getmaxaddDeduct(todate,adopt).then(
         dataRespone => res.json(dataRespone)
@@ -789,6 +795,21 @@ router.post('/calpayroll/:yearid/:monthid',(req,res,next) =>{
     );
 });
 
+// get payroll
+
+router.get('/getpayroll/:yearid/:monthid/:employeeid',(req,res,next) =>{
+
+    const yearid = req.params.yearid,
+          monthid = req.params.monthid,
+          employeeid = req.params.employeeid;
+    payrollFunction.getPayroll(yearid,monthid,employeeid).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+});
+
+
 //#endregion
 //---------------------- employee's payroll  ------------------------// end
 
@@ -838,4 +859,71 @@ router.get('/getListParameter',(req,res,next) =>{
 //#endregion
 //---------------------- parameter ------------------------// end
 
+
+
+//---------------------- account ------------------------// begin
+//#region 
+
+// register account
+router.post('/registerAccount',(req,res,next) =>{
+    
+    accountCRUD.registerAccount(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+});
+
+// update account
+router.post('/updateAccount',authToken,(req,res,next) =>{
+    
+    accountCRUD.updateAccount(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+});
+
+// delete account
+router.post('/deleteAccount',authToken,(req,res,next) =>{
+    
+    accountCRUD.deleteAccount(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+});
+
+// update password
+router.post('/updatePassword',authToken,(req,res,next) =>{
+
+    accountCRUD.updatePassword(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+});
+
+// update access token
+router.post('/updateToken',(req,res,next) => {
+
+    accountCRUD.updateAccessToken(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+});
+
+// login
+router.get('/login',(req,res,next) =>{
+    const body = {...req.body};
+    accountFunction.login(body).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+});
+
+//#endregion
+//---------------------- account ------------------------// end
 module.exports = router;

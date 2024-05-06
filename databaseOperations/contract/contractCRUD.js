@@ -7,6 +7,7 @@ const objectIdmg = require('mongodb').ObjectId;
 const validateSupport = require('../../other/supportValidateSchema');
 const momentJS = require('moment');
 const dbName = "humanproject";
+const statusRequest = require('../../other/supportStatus').statusRequest;
 
 /////////////////---------------- contraction structure -----------------------/////////////////////
 //#region 
@@ -26,7 +27,7 @@ async function createcontractionStruct(body)
     //const checkExistsEmppos = await colltblemppos.find({}).project({_id:0,posId:1}).toArray();
     const checkExistsMap = [...checkExists].map(ele => ele.contractTypeId);
     const dataClient = body.body;
-    if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     let listDataForInsert = dataClient.filter((ele) => (checkExistsMap.includes(ele.contractTypeId))? false : true);
     
     const listDataForvalidateEmpContract = ([...listDataForInsert].map(ele => ele.contractTypeId)).concat(checkExistsMap);
@@ -96,7 +97,7 @@ async function updatecontractionStruct(body)
     try {
     const dataClient = body.body;
     let totalRowsAffect = 0;    
-    if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     // can not update document which's using by employee(becuz month caculation will not be right)
     let dataClientFilter = [...dataClient].filter(ele => getListEmpContractMap.includes(ele.contractTypeId)? false: true);
     dataClientFilter = dataClientFilter.filter(ele => ([...getListref_contract].map(eleInner => eleInner.contractTypeId)).includes(ele.contractTypeId));
@@ -164,7 +165,7 @@ async function deletecontractionStruct(body)
     try {
     const dataClient = body.body;
     let totalRowsAffect = 0;    
-    if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     let dataClientFilter = [...dataClient].filter(ele => getListEmpContractMap.includes(ele.contractTypeId)? false: true );
     dataClientFilter = dataClientFilter.filter(ele => ([...getListref_contract].map(eleInner => eleInner.contractTypeId)).includes(ele.contractTypeId));
 
@@ -234,7 +235,7 @@ async function createEmployeecontraction(body)
     
     try {
     const dataClient = body.body;
-    if(!(dataClient instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
 
     const listEmployeeIdInDB = await colltblemployee.find().project({employeeId:1}).toArray();
     let listDataForInsert = dataClient.filter((ele) => ([...getListEmpContract].some(
@@ -285,7 +286,7 @@ async function updateEmployeecontraction(body)
 
     try {
     const dataClient = body.body;
-    if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     
     const listEmployeeIdInDB = await colltblemployee.find().project({employeeId:1}).toArray();
     // check valid employeeid from tblemployee
@@ -345,7 +346,7 @@ async function deleteEmployeecontraction(body)
     try {
     const dataClient = body.body;
     let totalRowsAffect = 0;
-    if(!(dataClient instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient instanceof Array)) throw statusRequest(0).message;
     for(let ele of dataClient)
     {
         const dataForDelete = {

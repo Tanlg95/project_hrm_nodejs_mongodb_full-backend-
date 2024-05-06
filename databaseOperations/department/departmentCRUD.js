@@ -6,6 +6,7 @@ const status = require("../../other/supportStatus").status;
 const objectIdmg = require('mongodb').ObjectId;
 const supportvalidateSchema = require('../../other/supportValidateSchema');
 const dbName = 'humanproject';
+const statusRequest = require('../../other/supportStatus').statusRequest;
 
 /////////////////---------------- department structure -----------------------/////////////////////
 //#region 
@@ -23,7 +24,7 @@ async function createDepartmentStruct(body)
      let dataClient = body.body;    
      // varible check real data ( exists in collection) or data from req
      let isrealDataExists = 0;
-     if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
+     if(!(dataClient  instanceof Array)) throw statusRequest(0);
      const db = connect.db(dbName);
      const collTblRefdepartment = db.collection(collName);
      // check data if exists
@@ -179,7 +180,7 @@ async function updateDepartmentStruct(body)
     }
     mapListDep = Array.from(mapListDep.values()).filter(ele => ele !== null);
 
-    if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0);
     const dataClientTypeIdFilter = dataClient.filter(ele => {
         let depTypeId = listExistsTblref_department.filter(eleInner => eleInner.depId === ele.depParent).map(ele => ele.depTypeId)[0];
         depTypeId = (depTypeId === 'T')? 'P' : (depTypeId === 'G')? 'T' : (depTypeId === 'L')? 'G' : (depTypeId === 'S')? 'L' : null;
@@ -305,7 +306,7 @@ async function deleteDepartmentStruct(body)
     mapListDep = Array.from(mapListDep.values()).filter(ele => ele !== null);
     //console.log(mapListDep);
     
-    if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0);
     let dataClientFilter = dataClient.filter(ele => (mapListDep.some(eleInner => eleInner === ele.depId))? false: true );
     const getTblref_department = await collTblRefdepartment.find({}).project({_id:0, depId:1, depTypeId: 1,depParent : 1 }).toArray();
     // can not remove depId which belong to deparent of other department
@@ -384,7 +385,7 @@ async function createEmployeeDepartment(body)
     // create index if not exists
     await collEmpDep.createIndexes([{ key: {employeeId: 1, dateChange: -1}, name: "idx_employeeId_dateChange"},{key:{dateChange: -1},name:"idx_dateChange"}]);
     let dataClient = body.body;    
-    if(!dataClient instanceof Array) throw new Error(`data must be an array!!!!`);
+    if(!dataClient instanceof Array) throw statusRequest(0);
     // check data if exists
     const checkExistsEmpdep = await collEmpDep.find({}).toArray();
     const checkExistsEmployee = await collEmployee.find().project({employeeId:1}).toArray();
@@ -448,7 +449,7 @@ async function updateEmployeeDepartment(body)
     const collref_dep = db.collection('tblref_department');
     try {
     const dataClient = body.body;
-    if(!(dataClient  instanceof Array)) throw new Error(`data must be an array!!!!`);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0);
     const listDepIdInDB = await collref_dep.find({}).project({_id:0,depId:1, depTypeId: 1, depParent: 1}).toArray();
     
     // validate deparents
@@ -492,7 +493,7 @@ async function deleteEmployeeDepartment(body)
     try {
     const dataClient = body.body;
     let totalRowsAffect = dataClient.length;
-    if(!dataClient instanceof Array) throw new Error(`data must be an array!!!!`);
+    if(!dataClient instanceof Array) throw statusRequest(0);
     for(let ele of dataClient)
     {
         const dataForDelete = {
