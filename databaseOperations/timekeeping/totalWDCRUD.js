@@ -24,16 +24,16 @@ async function createTotalWD(body)
     
 
     const validateSchema = {...validateSupport(tblname_totalWD,null)};
-    try {
-    await db.createCollection(tblname_totalWD,{
-        validator: validateSchema
-    });
-    } catch (error) {
-    await db.command({
-        collMod: tblname_totalWD,
-        validator: validateSchema
-    });
-    }
+    // try {
+    // await db.createCollection(tblname_totalWD,{
+    //     validator: validateSchema
+    // });
+    // } catch (error) {
+    // await db.command({
+    //     collMod: tblname_totalWD,
+    //     validator: validateSchema
+    // });
+    // }
     try {
     const dataClient = body.body;
     if(!(dataClient instanceof Array)) throw statusRequest(0).message;

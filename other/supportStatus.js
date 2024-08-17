@@ -76,11 +76,40 @@ function statusRequest(opt)
             status = new Error(`req.body is not an Array! please check again`);
         break;
     }
+    return status;
+}
+
+function statusCollection(opt)
+{
+    let status = undefined;
+    if(![0,1,2].includes(opt)) return new Error(`incorrect opt unput`)
+
+    /*
+    status =>
+        0: req.body is not an Array, please check again!
+    */
+    switch(opt){
+        case 0:
+            status = {
+                status: "Ok!",
+                description: "The collection has been created !!!"
+            };
+        break;
+        case 1:
+            status = {
+                status: "Ok!",
+                description: "The collection has been modified !!!"
+            };
+        break;
+    }
+    return status;
 }
 
 
 module.exports = {
     status: statusCRUD,
     statusLogin: statusLogin,
-    statusRequest: statusRequest
+    statusRequest: statusRequest,
+    statusCollection: statusCollection,
+
 };

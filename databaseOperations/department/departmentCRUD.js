@@ -24,7 +24,7 @@ async function createDepartmentStruct(body)
      let dataClient = body.body;    
      // varible check real data ( exists in collection) or data from req
      let isrealDataExists = 0;
-     if(!(dataClient  instanceof Array)) throw statusRequest(0);
+     if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
      const db = connect.db(dbName);
      const collTblRefdepartment = db.collection(collName);
      // check data if exists
@@ -87,31 +87,31 @@ async function createDepartmentStruct(body)
     const validateSchema ={...supportvalidateSchema(collName,checkExistsref_department)}; 
     const setDepref = setDep;
     const sectionId = setDepref('S',checkExists),lineId = setDepref('L',checkExists),groupId = setDepref('G',checkExists),teamId = setDepref('T',checkExists),partId = setDepref('P',checkExists);
-    const validateSchemaTblempDep = {...supportvalidateSchema(collNametblEmpDep,[sectionId,lineId,groupId,teamId,partId])}
+    // const validateSchemaTblempDep = {...supportvalidateSchema(collNametblEmpDep,[sectionId,lineId,groupId,teamId,partId])}
+    // try {
+    //     await db.createCollection(collNametblEmpDep,{
+    //         validator: validateSchemaTblempDep
+    //     });
+    // } catch (error) {
+    //     await db.command({
+    //         collMod: collNametblEmpDep,
+    //         validator: validateSchemaTblempDep
+    //     })
+    // }
+    // try {
+    //     // create collection if not exists with validate schema
+    //     await db.createCollection(collName,{
+    //         validator: validateSchema
+    //     })
+    // } catch (error) {
+    //     // if collection has already existed in db and validate schema was changed, we need to update validate 
+    //     await db.command({
+    //         collMod: collName,
+    //         validator: validateSchema
+    //     })
+    // }
     try {
-        await db.createCollection(collNametblEmpDep,{
-            validator: validateSchemaTblempDep
-        });
-    } catch (error) {
-        await db.command({
-            collMod: collNametblEmpDep,
-            validator: validateSchemaTblempDep
-        })
-    }
-    try {
-        // create collection if not exists with validate schema
-        await db.createCollection(collName,{
-            validator: validateSchema
-        })
-    } catch (error) {
-        // if collection has already existed in db and validate schema was changed, we need to update validate 
-        await db.command({
-            collMod: collName,
-            validator: validateSchema
-        })
-    }
-    try {
-    await collTblRefdepartment.createIndexes([{key:{depId: 1}, name: "idx_tblref_department_depId"}]);
+   
     //collTblRefdepartment.createIndex({depId: 1});
     
     // when some data has already existed in collection then we need to filter the data which not exists in collection
@@ -180,7 +180,7 @@ async function updateDepartmentStruct(body)
     }
     mapListDep = Array.from(mapListDep.values()).filter(ele => ele !== null);
 
-    if(!(dataClient  instanceof Array)) throw statusRequest(0);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     const dataClientTypeIdFilter = dataClient.filter(ele => {
         let depTypeId = listExistsTblref_department.filter(eleInner => eleInner.depId === ele.depParent).map(ele => ele.depTypeId)[0];
         depTypeId = (depTypeId === 'T')? 'P' : (depTypeId === 'G')? 'T' : (depTypeId === 'L')? 'G' : (depTypeId === 'S')? 'L' : null;
@@ -236,14 +236,14 @@ async function updateDepartmentStruct(body)
     const sectionId = setDepempdep('S',listdepartmentforValidateEmpdep),lineId = setDepempdep('L',listdepartmentforValidateEmpdep),groupId = setDepempdep('G',listdepartmentforValidateEmpdep),teamId = setDepempdep('T',listdepartmentforValidateEmpdep),partId = setDepempdep('P',listdepartmentforValidateEmpdep);
     const updateSchemaTblempDep = {...supportvalidateSchema(tblempdep,[sectionId,lineId,groupId,teamId,partId])};
 
-    await db.command({
-        collMod: tblref_department,
-        validator: updateSchemaref_department
-    });
-    await db.command({
-        collMod: tblempdep,
-        validator: updateSchemaTblempDep
-    })
+    // await db.command({
+    //     collMod: tblref_department,
+    //     validator: updateSchemaref_department
+    // });
+    // await db.command({
+    //     collMod: tblempdep,
+    //     validator: updateSchemaTblempDep
+    // })
     
     return status(totalRowsAffect,1);
     } catch (error) {
@@ -306,7 +306,7 @@ async function deleteDepartmentStruct(body)
     mapListDep = Array.from(mapListDep.values()).filter(ele => ele !== null);
     //console.log(mapListDep);
     
-    if(!(dataClient  instanceof Array)) throw statusRequest(0);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     let dataClientFilter = dataClient.filter(ele => (mapListDep.some(eleInner => eleInner === ele.depId))? false: true );
     const getTblref_department = await collTblRefdepartment.find({}).project({_id:0, depId:1, depTypeId: 1,depParent : 1 }).toArray();
     // can not remove depId which belong to deparent of other department
@@ -329,14 +329,14 @@ async function deleteDepartmentStruct(body)
     const sectionId = setDepempdep('S',mapdataempdep),lineId = setDepempdep('L',mapdataempdep),groupId = setDepempdep('G',mapdataempdep),teamId = setDepempdep('T',mapdataempdep),partId = setDepempdep('P',mapdataempdep);
     const updateSchemaTblempDep = {...supportvalidateSchema(collEmpDep,[sectionId,lineId,groupId,teamId,partId])};
 
-    await db.command({
-        collMod: collName,
-        validator: updateSchema
-    });
-    await db.command({
-        collMod: collEmpDep,
-        validator: updateSchemaTblempDep
-    })
+    // await db.command({
+    //     collMod: collName,
+    //     validator: updateSchema
+    // });
+    // await db.command({
+    //     collMod: collEmpDep,
+    //     validator: updateSchemaTblempDep
+    // })
     return status(totalRowsAffect,2);
 
     } catch (error) {
@@ -371,21 +371,22 @@ async function createEmployeeDepartment(body)
     const sectionId = setDepempdep('S',checkExistsDepId),lineId = setDepempdep('L',checkExistsDepId),groupId = setDepempdep('G',checkExistsDepId),teamId = setDepempdep('T',checkExistsDepId),partId = setDepempdep('P',checkExistsDepId);
 
     const validateSchema = {...supportvalidateSchema(collName,[sectionId,lineId,groupId,teamId,partId])};
-    try {
-    await db.createCollection(collName,{
-        validator: validateSchema
-    });
-    } catch (error) {
-        await db.command({
-            collMod: collName,
-            validator: validateSchema
-        });
-    }
+    // try {
+    // await db.createCollection(collName,{
+    //     validator: validateSchema
+    // });
+    // } catch (error) {
+    //     await db.command({
+    //         collMod: collName,
+    //         validator: validateSchema
+    //     });
+    // }
     try {
     // create index if not exists
-    await collEmpDep.createIndexes([{ key: {employeeId: 1, dateChange: -1}, name: "idx_employeeId_dateChange"},{key:{dateChange: -1},name:"idx_dateChange"}]);
+    //await collEmpDep.createIndexes([{ key: {employeeId: 1, dateChange: -1}, name: "idx_employeeId_dateChange"},{key:{dateChange: -1},name:"idx_dateChange"}]);
+    
     let dataClient = body.body;    
-    if(!dataClient instanceof Array) throw statusRequest(0);
+    if(!dataClient instanceof Array) throw statusRequest(0).message;
     // check data if exists
     const checkExistsEmpdep = await collEmpDep.find({}).toArray();
     const checkExistsEmployee = await collEmployee.find().project({employeeId:1}).toArray();
@@ -449,7 +450,7 @@ async function updateEmployeeDepartment(body)
     const collref_dep = db.collection('tblref_department');
     try {
     const dataClient = body.body;
-    if(!(dataClient  instanceof Array)) throw statusRequest(0);
+    if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     const listDepIdInDB = await collref_dep.find({}).project({_id:0,depId:1, depTypeId: 1, depParent: 1}).toArray();
     
     // validate deparents
@@ -493,7 +494,7 @@ async function deleteEmployeeDepartment(body)
     try {
     const dataClient = body.body;
     let totalRowsAffect = dataClient.length;
-    if(!dataClient instanceof Array) throw statusRequest(0);
+    if(!dataClient instanceof Array) throw statusRequest(0).message;
     for(let ele of dataClient)
     {
         const dataForDelete = {

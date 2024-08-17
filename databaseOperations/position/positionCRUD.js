@@ -31,27 +31,27 @@ async function createpositionStruct(body)
     
     const listDataForvalidateEmppos = ([...listDataForInsert].map(ele => ele.posId)).concat(checkExistsMap);
     //console.log(listDataForvalidateEmppos);
-    try {
-        await db.createCollection(tblref_position,{
-            validator: {...validateSupport(tblref_position,null)}
-        });
-    } catch (error) {
-        await db.command({
-            collMod: tblref_position,
-            validator: {...validateSupport(tblref_position,null)}
-        })
-    }
-    try {
-        await db.createCollection(tblemppos,{
-            validator: {...validateSupport(tblemppos,listDataForvalidateEmppos)}
-        });
-    } catch (error) {
-        await db.command({
-            collMod: tblemppos,
-            validator: {...validateSupport(tblemppos,listDataForvalidateEmppos)}
-        })
-    }
-    await collref_position.createIndex({posId:1});
+    // try {
+    //     await db.createCollection(tblref_position,{
+    //         validator: {...validateSupport(tblref_position,null)}
+    //     });
+    // } catch (error) {
+    //     await db.command({
+    //         collMod: tblref_position,
+    //         validator: {...validateSupport(tblref_position,null)}
+    //     })
+    // }
+    // try {
+    //     await db.createCollection(tblemppos,{
+    //         validator: {...validateSupport(tblemppos,listDataForvalidateEmppos)}
+    //     });
+    // } catch (error) {
+    //     await db.command({
+    //         collMod: tblemppos,
+    //         validator: {...validateSupport(tblemppos,listDataForvalidateEmppos)}
+    //     })
+    // }
+    //await collref_position.createIndex({posId:1});
     
     try {
    
@@ -159,10 +159,10 @@ async function deletepositionStruct(body)
     const listref_pos_validate = [...getlistref_pos].filter(ele => ([...dataClientFilter].map(eleInner => eleInner.posId)).includes(ele.posId)? false : true );
 
     const validateSchemaempPos = {...validateSupport(tblemppos,listref_pos_validate)}
-    await db.command({
-        collMod: tblemppos,
-        validator: validateSchemaempPos
-    });
+    // await db.command({
+    //     collMod: tblemppos,
+    //     validator: validateSchemaempPos
+    // });
     try {
     if(dataClientFilter.length === 0) return status(0,2);
     for(let ele of dataClientFilter)
@@ -203,17 +203,17 @@ async function createEmployeeposition(body)
     const getListRef_posMap = getListRef_pos.map(ele => ele.posId);
  
     const validateSchema = {...validateSupport(tblemppos,getListRef_posMap)};
-    try {
-        await db.createCollection(tblemppos,{
-            validator: validateSchema
-        });
-    } catch (error) {
-        //console.log(error);
-        await db.command({
-            collMod: tblemppos,
-            validator: validateSchema
-        })
-    };
+    // try {
+    //     await db.createCollection(tblemppos,{
+    //         validator: validateSchema
+    //     });
+    // } catch (error) {
+    //     //console.log(error);
+    //     await db.command({
+    //         collMod: tblemppos,
+    //         validator: validateSchema
+    //     })
+    // };
     
     try {
     const dataClient = body.body;

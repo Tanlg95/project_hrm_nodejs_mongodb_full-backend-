@@ -25,16 +25,16 @@ async function createparameter(body)
     
 
     const validateSchema = {...validateSupport(tblname_parameter,null)};
-    try {
-    await db.createCollection(tblname_parameter,{
-        validator: validateSchema
-    });
-    } catch (error) {
-    await db.command({
-        collMod: tblname_parameter,
-        validator: validateSchema
-    });
-    }
+    // try {
+    // await db.createCollection(tblname_parameter,{
+    //     validator: validateSchema
+    // });
+    // } catch (error) {
+    // await db.command({
+    //     collMod: tblname_parameter,
+    //     validator: validateSchema
+    // });
+    // }
     try {
     const dataClient = body.body;
     if(!(dataClient instanceof Array)) throw statusRequest(0).message;
@@ -47,7 +47,7 @@ async function createparameter(body)
         value: (!Number(ele.value)) ? ele.value :  new Double(ele.value),
         note: ele.note
     }));
-    console.log(dataClientFilter);
+    //console.log(dataClientFilter);
     const respone = await coll_parameter.insertMany(dataClientFilter);
     return respone;
     } catch (error) {

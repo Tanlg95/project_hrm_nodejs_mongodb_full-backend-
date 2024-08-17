@@ -22,6 +22,7 @@ async function createcontractionStruct(body)
     const tblname_emp = 'tblempContract';
     const collref_contraction = db.collection(tblname_ref);
     const colltblempcontract = db.collection(tblname_emp);
+
     // check data if exists
     const checkExists = await collref_contraction.find({}).project({_id:0,contractTypeId: 1}).toArray();
     //const checkExistsEmppos = await colltblemppos.find({}).project({_id:0,posId:1}).toArray();
@@ -29,31 +30,6 @@ async function createcontractionStruct(body)
     const dataClient = body.body;
     if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     let listDataForInsert = dataClient.filter((ele) => (checkExistsMap.includes(ele.contractTypeId))? false : true);
-    
-    const listDataForvalidateEmpContract = ([...listDataForInsert].map(ele => ele.contractTypeId)).concat(checkExistsMap);
-    //console.log(listDataForvalidateEmpContract);
-    try {
-        await db.createCollection(tblname_ref,{
-            validator: {...validateSupport(tblname_ref,null)}
-        });
-    } catch (error) {
-        await db.command({
-            collMod: tblname_ref,
-            validator: {...validateSupport(tblname_ref,null)}
-        })
-    }
-    try {
-        await db.createCollection(tblname_emp,{
-            validator: {...validateSupport(tblname_emp,listDataForvalidateEmpContract)}
-        });
-    } catch (error) {
-        await db.command({
-            collMod: tblname_emp,
-            validator: {...validateSupport(tblname_emp,listDataForvalidateEmpContract)}
-        })
-    }
-    await collref_contraction.createIndexes([{key:{contractTypeId:1},name:"idx_contract_contractTypeId"}]);
-    await colltblempcontract.createIndexes([{key:{employeeId:1,dateChange:-1,contractTypeId: 1},name:"idx_empcontract_employeeId_dateChange_contractTypeId"}]);
     
     try {
    
@@ -169,14 +145,14 @@ async function deletecontractionStruct(body)
     let dataClientFilter = [...dataClient].filter(ele => getListEmpContractMap.includes(ele.contractTypeId)? false: true );
     dataClientFilter = dataClientFilter.filter(ele => ([...getListref_contract].map(eleInner => eleInner.contractTypeId)).includes(ele.contractTypeId));
 
-    const validateSchemaref_contractListType = ([...getListref_contract].map(ele => ele.contractTypeId)).
-    filter(eleInner => ([...dataClientFilter].map(eleInner2 => eleInner2.contractTypeId)).includes(eleInner)? false : true);
+    // const validateSchemaref_contractListType = ([...getListref_contract].map(ele => ele.contractTypeId)).
+    // filter(eleInner => ([...dataClientFilter].map(eleInner2 => eleInner2.contractTypeId)).includes(eleInner)? false : true);
 
-    const validateSchema = {...validateSupport(tblname_emp,validateSchemaref_contractListType)};
-    await db.command({
-        collMod: tblname_emp,
-        validator: validateSchema
-    });
+    // const validateSchema = {...validateSupport(tblname_emp,validateSchemaref_contractListType)};
+    // await db.command({
+    //     collMod: tblname_emp,
+    //     validator: validateSchema
+    // });
 
     if(dataClientFilter.length === 0) return status(0,2);
     for(let ele of dataClientFilter)
@@ -220,18 +196,18 @@ async function createEmployeecontraction(body)
     const getListEmpContract = await colltblempcontract.find({}).project({_id:0, employeeId: 1, fromdate: 1}).toArray();
     const getListref_contractMap = [...getListref_contract].map(ele => ele.contractTypeId);
 
-    const validateSchema = {...validateSupport(tblname_emp,getListref_contractMap)};
-    try {
-        await db.createCollection(tblname_emp,{
-            validator: validateSchema
-        });
-    } catch (error) {
-        //console.log(error);
-        db.command({
-            collMod: tblname_emp,
-            validator: validateSchema
-        })
-    };
+    // const validateSchema = {...validateSupport(tblname_emp,getListref_contractMap)};
+    // try {
+    //     await db.createCollection(tblname_emp,{
+    //         validator: validateSchema
+    //     });
+    // } catch (error) {
+    //     //console.log(error);
+    //     db.command({
+    //         collMod: tblname_emp,
+    //         validator: validateSchema
+    //     })
+    // };
     
     try {
     const dataClient = body.body;

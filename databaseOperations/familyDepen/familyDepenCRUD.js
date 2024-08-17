@@ -8,28 +8,27 @@ const validateSupport = require('../../other/supportValidateSchema');
 const momentJS = require('moment');
 const dbName = "humanproject";
 const statusRequest = require('../../other/supportStatus').statusRequest;
-/////////////////---------------- type structure -----------------------/////////////////////
+/////////////////---------------- relation structure -----------------------/////////////////////
 //#region 
 
-//----------------------------- create type structure --------------------------------// begin
+//----------------------------- create relation structure --------------------------------// begin
 //#region 
-async function createtypeStruct(body)
+async function createRelateStruct(body)
 {
     const connect = await mongodb.connect(connectString);
     const db = connect.db(dbName);
-    const tblname_ref = "tblref_empType";
-    const tblname_emp = 'tblempType';
-    const collref_type = db.collection(tblname_ref);
-    const colltblempType = db.collection(tblname_emp);
+    const tblname_ref = "tblref_relation";
+    const tblname_emp = 'tblempFamilyDepen';
+    const collref = db.collection(tblname_ref);
+    const colltblemp = db.collection(tblname_emp);
     // check data if exists
-    const checkExists = await collref_type.find({}).project({_id:0,empTypeId: 1}).toArray();
-    //const checkExistsEmppos = await colltblemppos.find({}).project({_id:0,posId:1}).toArray();
-    const checkExistsMap = [...checkExists].map(ele => ele.empTypeId);
+    const checkExists = await collref.distinct("relateId");
+
     const dataClient = body.body;
     if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
-    let listDataForInsert = dataClient.filter((ele) => (checkExistsMap.includes(ele.empTypeId))? false : true);
+    let listDataForInsert = dataClient.filter((ele) => (checkExists.includes(ele.relateId))? false : true);
     
-    const listDataForvalidateEmpType = ([...listDataForInsert].map(ele => ele.empTypeId)).concat(checkExistsMap);
+    const listDataForvalidateEmpRelate = ([...listDataForInsert].map(ele => ele.relateId)).concat(checkExists);
     //console.log(listDataForvalidateEmpType);
     // try {
     //     await db.createCollection(tblname_ref,{
@@ -43,16 +42,16 @@ async function createtypeStruct(body)
     // }
     // try {
     //     await db.createCollection(tblname_emp,{
-    //         validator: {...validateSupport(tblname_emp,listDataForvalidateEmpType)}
+    //         validator: {...validateSupport(tblname_emp,listDataForvalidateEmpRelate)}
     //     });
     // } catch (error) {
     //     await db.command({
     //         collMod: tblname_emp,
-    //         validator: {...validateSupport(tblname_emp,listDataForvalidateEmpType)}
+    //         validator: {...validateSupport(tblname_emp,listDataForvalidateEmpRelate)}
     //     })
     // }
-    // await collref_type.createIndexes([{key:{empTypeId:1},name:"idx_emptype_empTypeId"}]);
-    // await colltblempType.createIndexes([{key:{employeeId:1,dateChange:-1,empTypeId: 1},name:"idx_empType_employeeId_dateChange_empTypeId"}]);
+    // await collref.createIndexes([{key:{relateId:1},name:"idx_ref_relation_relateId"}]);
+    // await colltblemp.createIndexes([{key:{employeeId:1,perDepenIDcard: 1, fromdate: -1},name:"idx_familyDepen_employeeId_perDepenIDcard_relateId"}]);
     
     try {
    
@@ -60,13 +59,13 @@ async function createtypeStruct(body)
     //console.log(listDataForInsert);
     const dataForInsert = listDataForInsert.reduce((value,current) => {
         value.push({
-            empTypeId: current.empTypeId,
-            empTypeName: current.empTypeName,
+            relateId: current.relateId,
+            relateName: current.relateName,
             note: current.note
         })
         return value;
     },[]);
-    const listtypeStructure = await collref_type.insertMany(dataForInsert);
+    const listtypeStructure = await collref.insertMany(dataForInsert);
     return listtypeStructure;
     } catch (error) {
         //console.log(error);
@@ -76,38 +75,39 @@ async function createtypeStruct(body)
     }
 }
 //#endregion
-//----------------------------- create type structure --------------------------------// end
+//----------------------------- create relation structure --------------------------------// end
 
-//----------------------------- update type structure --------------------------------// begin
+//----------------------------- update realation structure --------------------------------// begin
 //#region 
-async function updatetypeStruct(body)
+async function updateRelateStruct(body)
 {
     const connect = await mongodb.connect(connectString);
     const db = connect.db(dbName);
-    const tblname_ref = 'tblref_empType';
-    const collref_type = db.collection(tblname_ref);
-    const getListref_empType= await collref_type.find({}).project({_id: 0, empTypeId: 1}).toArray();
+    const tblname_ref = 'tblref_relation';
+    const collref = db.collection(tblname_ref);
+    const getListref_relate = await collref.distinct('relateId');
 
     try {
     const dataClient = body.body;
     let totalRowsAffect = 0;    
     if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     // can not update document which's using by employee
-    const dataClientFilter = dataClient.filter(ele => ([...getListref_empType].map(eleInner => eleInner.empTypeId)).includes(ele.empTypeId));
+    const dataClientFilter = dataClient.filter(ele => getListref_relate.includes(ele.relateId));
     //const dataClientFilteUpdateAll = [...dataClient].filter(ele => ([...dataClientFilter].map(eleInner => eleInner.posId)).includes(ele.posId)? false: true);
     //console.log(dataClientFilter);
+    if (dataClientFilter.length === 0)  return status(totalRowsAffect,1);
     for(let current of dataClientFilter)
     {
-     const filter = {'empTypeId' : current.empTypeId};
+     const filter = {'relateId' : current.relateId};
      const listDataUpdate = 
         {   
         $set:{
-            empTypeName: current.empTypeName,
+            relateName: current.relateName,
             note: current.note
         }
         };
     //console.log(listDataUpdate);
-    const respone = await collref_type.updateOne(filter,listDataUpdate);
+    const respone = await collref.updateOne(filter,listDataUpdate);
     totalRowsAffect += (respone.modifiedCount === 1)? 1 : 0;
     }
     //update all 
@@ -142,43 +142,42 @@ async function updatetypeStruct(body)
 
 //----------------------------- delete type structure --------------------------------// begin
 //#region 
-async function deletetypeStruct(body)
+async function deleteRelateStruct(body)
 {
     const connect = await mongodb.connect(connectString);
     const db = connect.db(dbName);
-    const tblname_ref = 'tblref_empType';
-    const tblname_emp = 'tblempType';
-    const collref_type = db.collection(tblname_ref);
-    const colltblempType = db.collection(tblname_emp);
-    const getListref_empType= await collref_type.find({}).project({_id: 0, empTypeId: 1}).toArray();
-    const getListEmpType = await colltblempType.find({}).project({_id:0, empTypeId: 1}).toArray();
-    const getListEmpTypeMap = [...getListEmpType].map(ele => ele.empTypeId);
+    const tblname_ref = 'tblref_relation';
+    const tblname_emp = 'tblempFamilyDepen';
+    const collref = db.collection(tblname_ref);
+    const colltblemp = db.collection(tblname_emp);
+    const getListref= await collref.distinct('relateId');
+    const getListEmp = await colltblemp.distinct('relateId');
 
     try {
     const dataClient = body.body;
     let totalRowsAffect = 0;    
     if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
-    let dataClientFilter = [...dataClient].filter(ele => getListEmpTypeMap.includes(ele.empTypeId)? false: true );
-    dataClientFilter = dataClientFilter.filter(ele => ([...getListref_empType].map(eleInner => eleInner.empTypeId)).includes(ele.empTypeId));
+    let dataClientFilter = [...dataClient].filter(ele => getListEmp.includes(ele.relateId)? false: true );
+    dataClientFilter = dataClientFilter.filter(ele => getListref.includes(ele.relateId));
     //console.log(dataClientFilter);
-    const validateSchemaref_empTypeList = ([...getListref_empType].map(ele => ele.empTypeId)).filter(
-        eleInner => ([...dataClientFilter].map(eleInner2 => eleInner2.empTypeId).includes(eleInner)? false : true
+    const validateSchemaref_emp = getListref.filter(
+        eleInner => ([...dataClientFilter].map(eleInner2 => eleInner2.relateId).includes(eleInner)? false : true
     ));
 
     //console.log(validateSchemaref_empTypeList);
-    const validateSchema = {...validateSupport(tblname_emp,validateSchemaref_empTypeList)};
+    const validateSchema = {...validateSupport(tblname_emp,validateSchemaref_emp)};
     // await db.command({
     //     collMod: tblname_emp,
     //     validator: validateSchema
     // });
 
-    if(dataClientFilter.length === 0) return status(0,2);
+    if(dataClientFilter.length === 0) return status(totalRowsAffect,2);
     for(let ele of dataClientFilter)
     {
         const dataForDelete = {
-            empTypeId: ele.empTypeId
+            relateId: ele.relateId
         }
-        const respone = await collref_type.deleteOne(dataForDelete);
+        const respone = await collref.deleteOne(dataForDelete);
         totalRowsAffect += (respone.deletedCount === 1)? 1 :0 ;
     }
     return status(totalRowsAffect,2);
@@ -200,21 +199,20 @@ async function deletetypeStruct(body)
 
 //----------------------------- create employee's type --------------------------------// begin
 //#region 
-async function createEmployeetype(body)
+async function createFamilyDepen(body)
 {
     const connect = await mongodb.connect(connectString);
     const db = connect.db(dbName);
-    const tblname_ref = 'tblref_empType';
-    const tblname_emp = 'tblempType';
+    const tblname_ref = 'tblref_relation';
+    const tblname_emp = 'tblempFamilyDepen';
     const tblname_employee = 'tblemployee';
-    const collref_type = db.collection(tblname_ref);
-    const colltblempType = db.collection(tblname_emp);
+    const collref = db.collection(tblname_ref);
+    const colltblemp = db.collection(tblname_emp);
     const colltblemployee = db.collection(tblname_employee);
-    const getListref_empType = await collref_type.find({}).project({_id: 0, empTypeId: 1}).toArray();
-    const getListEmpType = await colltblempType.find({}).project({_id:0, employeeId: 1, dateChange: 1}).toArray();
-    const getListref_empTypeMap = [...getListref_empType].map(ele => ele.empTypeId);
+    const getListref = await collref.distinct('relateId');
+    const getListEmp = await colltblemp.find({}).project({_id:0, employeeId: 1, perDepenIDcard: 1, fromdate: 1}).toArray();
 
-    const validateSchema = {...validateSupport(tblname_emp,getListref_empTypeMap)};
+    const validateSchema = {...validateSupport(tblname_emp,getListref)};
     // try {
     //     await db.createCollection(tblname_emp,{
     //         validator: validateSchema
@@ -231,26 +229,35 @@ async function createEmployeetype(body)
     const dataClient = body.body;
     if(!(dataClient instanceof Array)) throw statusRequest(0).message;
 
-    const listEmployeeIdInDB = await colltblemployee.find().project({employeeId:1}).toArray();
-    let listDataForInsert = dataClient.filter((ele) => ([...getListEmpType].some(
-        eleInner => eleInner.employeeId === ele.employeeId && functionSupport.castDate(eleInner.dateChange,1) === functionSupport.castDate(ele.dateChange,1)
-        ) === true)? false : true);
+    const listEmployeeIdInDB = await colltblemployee.distinct('employeeId');
+    let listDataForInsert = dataClient.filter((ele) => ([...getListEmp].some(
+        eleInner => eleInner.employeeId === ele.employeeId && 
+        functionSupport.castDate(eleInner.fromdate,1) === functionSupport.castDate(ele.fromdate,1) &&
+        eleInner.perDepenIDcard === ele.perDepenIDcard    
+    ) === true)? false : true);
   
-    listDataForInsert = (listDataForInsert.filter(ele => (listEmployeeIdInDB.map(eleInner => eleInner.employeeId)).includes(ele.employeeId))).
-    filter(eleInner => getListref_empTypeMap.includes(eleInner.empTypeId));
+    listDataForInsert = (listDataForInsert.filter(ele => listEmployeeIdInDB.includes(ele.employeeId))).
+    filter(eleInner => getListref.includes(eleInner.relateId));
    
     if(listDataForInsert.length === 0) return status(0,0);
     const dataForInsert = listDataForInsert.reduce((value,current) => {
         value.push({
-            employeeId: current.employeeId,
-            dateChange: functionSupport.castDate(current.dateChange,0),
-            empTypeId: current.empTypeId,
-            note: current.note
+            employeeId : current.employeeId,
+            perDepenName : current.perDepenName,
+            perDepenIDcard : current.perDepenIDcard,
+            perDepenSI_Num : current.perDepenSI_Num,
+            perDepenHI_Num : current.perDepenHI_Num,
+            perDepenUI_Num : current.perDepenUI_Num,
+            relateId : current.relateId,
+            fromdate : functionSupport.castDate(current.fromdate,0),
+            todate : functionSupport.castDate(current.todate,0),
+            note : current.note
+            
         })
         return value;
     },[]);
-    const listEmployeetype = await colltblempType.insertMany(dataForInsert);
-    return listEmployeetype;
+    const listFamilyDepen = await colltblemp.insertMany(dataForInsert);
+    return listFamilyDepen;
     } catch (error) {
         //console.log(error);
         throw error;
@@ -263,36 +270,34 @@ async function createEmployeetype(body)
 
 //----------------------------- update employee's type --------------------------------// begin
 //#region 
-async function updateEmployeetype(body)
+async function updateFamilyDepen(body)
 {
     const connect = await mongodb.connect(connectString);
     const db = connect.db(dbName);
-    const tblname_ref = 'tblref_empType';
-    const tblname_emp = 'tblempType';
+    const tblname_ref = 'tblref_relation';
+    const tblname_emp = 'tblempFamilyDepen';
     const tblname_employee = 'tblemployee';
-    const collref_type = db.collection(tblname_ref);
-    const colltblempType = db.collection(tblname_emp);
+    const collref = db.collection(tblname_ref);
+    const colltblemp = db.collection(tblname_emp);
     const colltblemployee = db.collection(tblname_employee);
-    const getListref_empType = await collref_type.find({}).project({_id: 0, empTypeId: 1}).toArray();
-    const getListEmpType = await colltblempType.find({}).project({_id:0, employeeId: 1, dateChange: 1, empTypeId: 1}).toArray();
-    const getListref_empTypeMap = [...getListref_empType].map(ele => ele.empTypeId);
-    
+    const getListref = await collref.distinct('relateId');
+    const getListEmp = await colltblemp.find({}).project({_id:0, employeeId: 1, perDepenIDcard: 1, fromdate: 1}).toArray();
 
     try {
     const dataClient = body.body;
     if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     // get list emloyeeId in DB
-    const listEmployeeIdInDB = await colltblemployee.find().project({employeeId:1}).toArray();
+    const listEmployeeIdInDB = await colltblemployee.distinct("employeeId");
     // check valid employeeid from tblemployee
-    let listDataForInsert = dataClient.filter(ele => ([...listEmployeeIdInDB].map(eleInner => eleInner.employeeId)).includes(ele.employeeId));
+    let listDataForInsert = dataClient.filter(ele => listEmployeeIdInDB.includes(ele.employeeId));
     // check valid duplicate data (employeeId, dateChange)
-    listDataForInsert = listDataForInsert.filter((ele) => ([...getListEmpType].some(
+    listDataForInsert = listDataForInsert.filter((ele) => ([...getListEmp].some(
         eleInner => eleInner.employeeId === ele.employeeId && 
-        functionSupport.castDate(eleInner.dateChange,1) === functionSupport.castDate(ele.dateChange,1) &&
-        eleInner.empTypeId === ele.empTypeId
+        functionSupport.castDate(eleInner.fromdate,1) === functionSupport.castDate(ele.fromdate,1) &&
+        eleInner.relateId === ele.relateId
         ) === true)? false : true);
-    // check valid empTypeId
-    listDataForInsert = listDataForInsert.filter(ele => getListref_empTypeMap.includes(ele.empTypeId));
+    // check valid relateId
+    listDataForInsert = listDataForInsert.filter(ele => getListref.includes(ele.relateId));
     //console.log(listDataForInsert);
     let totalRowsAffect = 0;    
     for(let current of listDataForInsert)
@@ -301,13 +306,18 @@ async function updateEmployeetype(body)
      const listDataUpdate = 
         {   
         $set:{
-            employeeId: current.employeeId,
-            dateChange: functionSupport.castDate(current.dateChange,0),
-            empTypeId: current.empTypeId,
-            note: current.note
+            perDepenName : current.perDepenName,
+            perDepenIDcard : current.perDepenIDcard,
+            perDepenSI_Num : current.perDepenSI_Num,
+            perDepenHI_Num : current.perDepenHI_Num,
+            perDepenUI_Num : current.perDepenUI_Num,
+            relateId : current.relateId,
+            fromdate : functionSupport.castDate(current.fromdate,0),
+            todate : functionSupport.castDate(current.todate,0),
+            note : current.note
         }
         };
-    const respone = await colltblempType.updateOne(filter,listDataUpdate);
+    const respone = await colltblemp.updateOne(filter,listDataUpdate);
     totalRowsAffect += (respone.modifiedCount === 1)? 1 : 0;
     //console.log(totalRowsAffect);
     }
@@ -324,7 +334,7 @@ async function updateEmployeetype(body)
 
 //----------------------------- delete employee's type --------------------------------// begin
 //#region 
-async function deleteEmployeetype(body)
+async function deleteFamilyDepen(body)
 {
     const connect = await mongodb.connect(connectString);
     try {
@@ -336,7 +346,7 @@ async function deleteEmployeetype(body)
         const dataForDelete = {
             _id: new objectIdmg(ele._id)
         }
-        const respone = await connect.db(dbName).collection('tblempType').deleteOne(dataForDelete);
+        const respone = await connect.db(dbName).collection('tblempFamilyDepen').deleteOne(dataForDelete);
         totalRowsAffect += (respone.deletedCount === 1)? 1 :0 ;
     }
     return status(totalRowsAffect,2);
@@ -355,13 +365,13 @@ async function deleteEmployeetype(body)
 
 
 module.exports = {
-    //--------------type structure---------------//
-    createtypeStruct: createtypeStruct,
-    updatetypeStruct: updatetypeStruct,
-    deletetypeStruct: deletetypeStruct,
+    //--------------relation structure---------------//
+    createRelateStruct: createRelateStruct,
+    updateRelateStruct: updateRelateStruct,
+    deleteRelateStruct: deleteRelateStruct,
 
-    //--------------employee's type--------------//
-    createEmployeetype: createEmployeetype,
-    updateEmployeetype: updateEmployeetype,
-    deleteEmployeetype: deleteEmployeetype
+    //--------------employee's relation--------------//
+    createFamilyDepen: createFamilyDepen,
+    updateFamilyDepen: updateFamilyDepen,
+    deleteFamilyDepen: deleteFamilyDepen
 };

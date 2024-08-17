@@ -36,16 +36,16 @@ async function createEmployee(body)
     const db = connect.db(dbName);
 
     const validateSchema = {...validateSupport(tblname_employee,null)};
-    try {
-    await db.createCollection(tblname_employee,{
-        validator: validateSchema
-    });
-    } catch (error) {
-    await db.command({
-        collMod: tblname_employee,
-        validator: validateSchema
-    });  
-    }
+    // try {
+    // await db.createCollection(tblname_employee,{
+    //     validator: validateSchema
+    // });
+    // } catch (error) {
+    // await db.command({
+    //     collMod: tblname_employee,
+    //     validator: validateSchema
+    // });  
+    // }
     try {
     const dataClient = body.body;    
     if(!(dataClient instanceof Array)) throw statusRequest(0).message;

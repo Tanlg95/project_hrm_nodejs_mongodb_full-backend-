@@ -317,6 +317,8 @@ async function callPayroll(monthid,yearid,employeeid)
     const getListAdd = await calAddDeduct(monthid,yearid,listEmployeeId,'A');
     // get list Deduct
     const getListDeduct = await calAddDeduct(monthid,yearid,listEmployeeId,'D');
+    // GET list pit salary
+    const getlistDepenSal =  await calPIT(monthid,yearid,listEmployeeId);
     
     
     // caculate work day salary
@@ -331,6 +333,7 @@ async function callPayroll(monthid,yearid,employeeid)
             const allowanceFix = (getListAllowanceFix.filter(ele => ele.employeeId === employeeId.employeeId))[0];
             const add = (getListAdd.filter(ele => ele.employeeId === employeeId.employeeId))[0];
             const deduct = (getListDeduct.filter(ele => ele.employeeId === employeeId.employeeId))[0];
+            const pitSal = (getlistDepenSal.filter(ele => ele.employeeId === employeeId.employeeId))[0];
 
             const listEmployeeId ={
                 yearId: Number(yearid),
@@ -412,7 +415,12 @@ async function callPayroll(monthid,yearid,employeeid)
                 UI_comp: new Double( insuraceSal.UI_comp),
                 Ins_comp_total: new Double( insuraceSal.Ins_comp_total ),
                 totalFamilyDepen: new Double( 0),
-                totalFamilyDepenSal: new Double( 0)
+                totalFamilyDepenSal: new Double( 0),
+                // employee PIT
+                dependenSeftSal: new Double( pitSal.dependenSeftSal),
+                totalDepend: new Double( pitSal.totalDepend),
+                dependenFamilySal: new Double( pitSal.dependenFamilySal )
+
             };
             // cal total salary
             listEmployeeId.totalSal = new Double(
@@ -424,7 +432,7 @@ async function callPayroll(monthid,yearid,employeeid)
                     listEmployeeId.totalWDSal + listEmployeeId.totalOTSalTax + listEmployeeId.totalAllowanceTaxSal +
                     listEmployeeId.totalAllowanceFixTaxSal + listEmployeeId.totalAddTaxSal);
             // actual taxable
-            listEmployeeId.incomeTax = new Double(calTaxAg(listEmployeeId.totalSalTax - (11000000 + listEmployeeId.totalFamilyDepenSal)));
+            listEmployeeId.incomeTax = new Double(calTaxAg(listEmployeeId.totalSalTax - (listEmployeeId.dependenSeftSal + listEmployeeId.dependenFamilySal)));
             // take home
             listEmployeeId.takehome = new Double(listEmployeeId.totalSal - listEmployeeId.incomeTax - listEmployeeId.Ins_emp_total -
                     listEmployeeId.totalDeductSal)
@@ -1011,6 +1019,7 @@ async function calAddDeduct(monthid, yearid, listEmployeeForCal,ADopt)
     }
 }
 
+// cal insurance
 async function calInsurance(monthid, yearid, listEmployeeForCal)
 {
   try {
@@ -1039,6 +1048,47 @@ async function calInsurance(monthid, yearid, listEmployeeForCal)
          Ins_comp_total: insurance.totalCompIns
       }
       listEmployee.push(employeeInsurance);
+    }
+  return listEmployee;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+// cal pit
+
+async function calPIT(monthid, yearid, listEmployeeForCal)
+{
+  try {
+    // get last of month
+    const lastOfMonth = getMonth(monthid,yearid,1);
+    // get para for PIT
+    const paraRare = await getPara('*');
+    const PITRare = {
+    dependF: filterPara(paraRare,'PITF'),
+    dependS: filterPara(paraRare,'PITS')
+  }
+    // get total dependend family
+    const getlistDepen = await (require('../../familyDepen/familyDepenFunction').getmaxDepenFamily(lastOfMonth))
+    const listEmployee = [];
+    for(let employeeId of listEmployeeForCal)
+    {
+      const totalDepend = ([...getlistDepen].filter(ele => ele._id === employeeId)).reduce(
+        (value, current) =>{
+          value += current.totalDepend;
+          return value;
+        }
+      ,0);
+      //console.log(basicSalary);
+      
+      let employeePIT ={
+         employeeId: employeeId,
+         dependenSeftSal: PITRare.dependS,
+         totalDepend: totalDepend,
+         dependenFamilySal: PITRare.dependF * totalDepend
+      }
+      listEmployee.push(employeePIT);
     }
   return listEmployee;
   } catch (error) {

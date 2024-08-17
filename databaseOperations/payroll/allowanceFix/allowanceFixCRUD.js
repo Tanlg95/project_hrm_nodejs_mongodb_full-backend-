@@ -30,17 +30,17 @@ async function createEmployeeallowanceFix(body)
 
     const getlistref_allowanceFix = await collref_allowanceFix.distinct("allowanceId",{IsFix: true});
     const validateSchema = {...validateSupport(tblname_empall,getlistref_allowanceFix)};
-    try {
-        await db.createCollection(tblname_empall,{
-            validator: validateSchema
-        });
-    } catch (error) {
-        //console.log(error);
-        await db.command({
-            collMod: tblname_empall,
-            validator: validateSchema
-        })
-    };
+    // try {
+    //     await db.createCollection(tblname_empall,{
+    //         validator: validateSchema
+    //     });
+    // } catch (error) {
+    //     //console.log(error);
+    //     await db.command({
+    //         collMod: tblname_empall,
+    //         validator: validateSchema
+    //     })
+    // };
     
     try {
     const dataClient = body.body;

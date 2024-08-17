@@ -22,16 +22,16 @@ async function registerAccount(body)
     const collAccount = db.collection(tblaccount);
 
     const validateSchema = {...validateSupport(tblaccount,null)};
-    try {
-    await db.createCollection(tblaccount,{
-        validator: validateSchema
-    });
-    } catch (error) {
-    await db.command({
-        collMod: tblaccount,
-        validator: validateSchema
-    });
-    }
+    // try {
+    // await db.createCollection(tblaccount,{
+    //     validator: validateSchema
+    // });
+    // } catch (error) {
+    // await db.command({
+    //     collMod: tblaccount,
+    //     validator: validateSchema
+    // });
+    // }
     try {
     const dataClient = body.body;
     if(!(dataClient instanceof Array)) throw statusRequest(0).message;

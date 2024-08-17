@@ -40,39 +40,39 @@ async function createallowanceStruct(body)
     const listDataForvalidateEmpallowanceFix = ([...listDataForInsert].filter(ele => ele.IsFix === true)).map(eleInner => eleInner.allowanceId).
     concat(([...checkExists].filter(eleInner2 => eleInner2.IsFix === true)).map(eleInner3 => eleInner3.allowanceId));;
     
-    try {
-        await db.createCollection(tblname_ref,{
-            validator: {...validateSupport(tblname_ref,null)}
-        });
-    } catch (error) {
-        await db.command({
-            collMod: tblname_ref,
-            validator: {...validateSupport(tblname_ref,null)}
-        })
-    }
-    try {
-        await db.createCollection(tblname_empall,{
-            validator: {...validateSupport(tblname_empall,listDataForvalidateEmpallowance)}
-        });
-    } catch (error) {
-        await db.command({
-            collMod: tblname_empall,
-            validator: {...validateSupport(tblname_empall,listDataForvalidateEmpallowance)}
-        })
-    }
-    try {
-        await db.createCollection(tblname_empallFix,{
-            validator: {...validateSupport(tblname_empallFix,listDataForvalidateEmpallowanceFix)}
-        });
-    } catch (error) {
-        await db.command({
-            collMod: tblname_empallFix,
-            validator: {...validateSupport(tblname_empallFix,listDataForvalidateEmpallowanceFix)}
-        })
-    }
-    await collref_allowance.createIndexes([{key:{allowanceId:1},name:"idx_refempallowance_allowanceId"}]);
-    await colltblempallowance.createIndexes([{key:{employeeId:1,dateChange:-1, allowanceId: 1},name:"idx_empallowance_employeeId_dateChange_allowanceId"}]);
-    await colltblempallowanceFix.createIndexes([{key:{employeeId:1,dateChange:-1, allowanceId: 1},name:"idx_empallowanceFix_employeeId_dateChange_allowanceId"}]);
+    // try {
+    //     await db.createCollection(tblname_ref,{
+    //         validator: {...validateSupport(tblname_ref,null)}
+    //     });
+    // } catch (error) {
+    //     await db.command({
+    //         collMod: tblname_ref,
+    //         validator: {...validateSupport(tblname_ref,null)}
+    //     })
+    // }
+    // try {
+    //     await db.createCollection(tblname_empall,{
+    //         validator: {...validateSupport(tblname_empall,listDataForvalidateEmpallowance)}
+    //     });
+    // } catch (error) {
+    //     await db.command({
+    //         collMod: tblname_empall,
+    //         validator: {...validateSupport(tblname_empall,listDataForvalidateEmpallowance)}
+    //     })
+    // }
+    // try {
+    //     await db.createCollection(tblname_empallFix,{
+    //         validator: {...validateSupport(tblname_empallFix,listDataForvalidateEmpallowanceFix)}
+    //     });
+    // } catch (error) {
+    //     await db.command({
+    //         collMod: tblname_empallFix,
+    //         validator: {...validateSupport(tblname_empallFix,listDataForvalidateEmpallowanceFix)}
+    //     })
+    // }
+    // await collref_allowance.createIndexes([{key:{allowanceId:1},name:"idx_refempallowance_allowanceId"}]);
+    // await colltblempallowance.createIndexes([{key:{employeeId:1,dateChange:-1, allowanceId: 1},name:"idx_empallowance_employeeId_dateChange_allowanceId"}]);
+    // await colltblempallowanceFix.createIndexes([{key:{employeeId:1,dateChange:-1, allowanceId: 1},name:"idx_empallowanceFix_employeeId_dateChange_allowanceId"}]);
 
     
     try {
@@ -213,14 +213,14 @@ async function deleteallowanceStruct(body)
     //console.log(validateSchemaref_empallowanceList);
     const validateSchemaAll = {...validateSupport(tblname_empall,validateSchemaAllArr)};
     const validateSchemaAllFix = {...validateSupport(tblname_empallFix,validateSchemaAllFixArr)};
-    await db.command({
-        collMod: tblname_empall,
-        validator: validateSchemaAll
-    });
-    await db.command({
-        collMod: tblname_empallFix,
-        validator: validateSchemaAllFix
-    });
+    // await db.command({
+    //     collMod: tblname_empall,
+    //     validator: validateSchemaAll
+    // });
+    // await db.command({
+    //     collMod: tblname_empallFix,
+    //     validator: validateSchemaAllFix
+    // });
 
     if(dataClientFilter.length === 0) return status(0,2);
     for(let ele of dataClientFilter)
@@ -263,17 +263,17 @@ async function createEmployeeallowance(body)
 
     const getlistref_allowance = await collref_allowance.distinct("allowanceId",{IsFix: false});
     const validateSchema = {...validateSupport(tblname_empall,getlistref_allowance)};
-    try {
-        await db.createCollection(tblname_empall,{
-            validator: validateSchema
-        });
-    } catch (error) {
-        //console.log(error);
-        await db.command({
-            collMod: tblname_empall,
-            validator: validateSchema
-        })
-    };
+    // try {
+    //     await db.createCollection(tblname_empall,{
+    //         validator: validateSchema
+    //     });
+    // } catch (error) {
+    //     //console.log(error);
+    //     await db.command({
+    //         collMod: tblname_empall,
+    //         validator: validateSchema
+    //     })
+    // };
     
     try {
     const dataClient = body.body;
@@ -341,7 +341,8 @@ async function updateEmployeeallowance(body)
     listDataForInsert = listDataForInsert.filter((ele) => ([...getListEmpallowance].some(
         eleInner => eleInner.employeeId === ele.employeeId && 
         functionSupport.castDate(eleInner.dateChange,1) === functionSupport.castDate(ele.dateChange,1) &&
-        eleInner.allowanceId === ele.allowanceId
+        eleInner.allowanceId === ele.allowanceId &&
+        Number(eleInner.amount) === Number(ele.amount)
         ) === true)? false : true);
     // check valid empallowanceId
     listDataForInsert = listDataForInsert.filter(ele => getlistref_allowance.includes(ele.allowanceId));

@@ -25,16 +25,16 @@ async function createpayroll(body)
     
 
     const validateSchema = {...validateSupport(tblname_payroll,null)};
-    try {
-    await db.createCollection(tblname_payroll,{
-        validator: validateSchema
-    });
-    } catch (error) {
-    await db.command({
-        collMod: tblname_payroll,
-        validator: validateSchema
-    });
-    }
+    // try {
+    // await db.createCollection(tblname_payroll,{
+    //     validator: validateSchema
+    // });
+    // } catch (error) {
+    // await db.command({
+    //     collMod: tblname_payroll,
+    //     validator: validateSchema
+    // });
+    // }
     try {
     const dataClient = body.body;
     if(!(dataClient instanceof Array)) throw statusRequest(0).message;

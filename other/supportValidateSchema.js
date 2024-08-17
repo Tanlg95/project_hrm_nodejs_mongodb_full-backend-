@@ -27,7 +27,7 @@ function getValidateSchema (tblname,...checkExists){
                         depParent: {
                             bsonType: ["null","string"],
                             maxLength: 50,
-                            enum: checkExists[0],
+                            //enum: checkExists[0],
                             description: "depParent must be string and must be in depId list"
                         },
                         depNo:{
@@ -61,31 +61,31 @@ function getValidateSchema (tblname,...checkExists){
                         sectionId:{
                             bsonType: "string",
                             maxLength: 50,
-                            enum: checkExists[0][0],
+                            //enum: checkExists[0][0],
                             description: "secitonId must be string and need be in list depId on tblref_department structure table"
                         },
                         lineId:{
                             bsonType: ["null","string"],
                             maxLength: 50,
-                            enum: checkExists[0][1],
+                            //enum: checkExists[0][1],
                             description: "lineId must be string and need be in list depId on tblref_department structure table"
                         },
                         groupId:{
                             bsonType: ["null","string"],
                             maxLength: 50,
-                            enum: checkExists[0][2],
+                            //enum: checkExists[0][2],
                             description: "groupId must be string and need be in list depId on tblref_department structure table"
                         },
                         teamId:{
                             bsonType: ["null","string"],
                             maxLength: 50,
-                            enum: checkExists[0][3],
+                            //enum: checkExists[0][3],
                             description: "teamId must be string and need be in list depId on tblref_department structure table"
                         },
                         partId:{
                             bsonType: ["null","string"],
                             maxLength: 50,
-                            enum: checkExists[0][4],
+                            //enum: checkExists[0][4],
                             description: "partId must be string and need be in list depId on tblref_department structure table"
                         },
                         note:{
@@ -141,7 +141,7 @@ function getValidateSchema (tblname,...checkExists){
                         posId:{
                             bsonType:"string",
                             maxLength: 50,
-                            enum: checkExists[0], // list position id validate
+                            // enum: checkExists[0], // list position id validate
                             description:"posId must be string"
                         },
                         note:{
@@ -206,7 +206,7 @@ function getValidateSchema (tblname,...checkExists){
                         },
                         contractTypeId:{
                             bsonType: "string",
-                            enum: checkExists[0],
+                            //enum: checkExists[0],
                             description:"note must be string"
                         },
                         note:{
@@ -264,7 +264,7 @@ function getValidateSchema (tblname,...checkExists){
                             bsonType: "string",
                             minLength: 2,
                             maxLength: 30,
-                            enum: checkExists[0],
+                            //enum: checkExists[0],
                             description: "empTypeId must be string"
                         },
                         note:{
@@ -412,6 +412,7 @@ function getValidateSchema (tblname,...checkExists){
                     }
                   }      
             }
+            break;
         case "tbltotalWD":
             validateSchema = {
                 $jsonSchema:{
@@ -545,7 +546,7 @@ function getValidateSchema (tblname,...checkExists){
                     },
                     allowanceId:{
                         bsonType: "string",
-                        enum: checkExists[0],
+                        //enum: checkExists[0],
                         description: "allowanceId must be string"
                     },
                     amount:{
@@ -578,7 +579,7 @@ function getValidateSchema (tblname,...checkExists){
                     },
                     allowanceId:{
                         bsonType: "string",
-                        enum: checkExists[0],
+                        //enum: checkExists[0],
                         description: "allowanceId must be string"
                     },
                     amount:{
@@ -679,7 +680,7 @@ function getValidateSchema (tblname,...checkExists){
                         addDeductId:{
                             bsonType: "string",
                             maxLength: 30,
-                            enum: checkExists[0],
+                            //enum: checkExists[0],
                             description: "addDeductId must be string"
                         },
                         amount:{
@@ -926,6 +927,115 @@ function getValidateSchema (tblname,...checkExists){
             }
         }
         break;
+    case "tblref_relation":
+        validateSchema = {
+            $jsonSchema:{
+                bsonType: "object",
+                required:["relateId","relateName","note"],
+                properties:{
+                    relateId:{
+                        bsonType: "string",
+                        maxLength: 30,
+                        description: "relateId must be string"
+                    },
+                    relateName:{
+                        bsonType: "string",
+                        maxLength: 150,
+                        description: "relateName must be string"
+                    },
+                    note:{
+                        bsonType: ["null","string"],
+                        maxLength: 250,
+                        description: "note must be string"
+                    }
+                }
+            }
+        }
+        break;
+    case "tblempFamilyDepen":
+        validateSchema = {
+            $jsonSchema:{
+                bsonType: "object",
+                required:["employeeId","perDepenName","perDepenIDcard","perDepenSI_Num","perDepenHI_Num","perDepenUI_Num","relateId","fromdate","todate","note"],
+                properties:{
+                    employeeId:{
+                        bsonType: "string",
+                        maxLength: 30,
+                        description: "employeeId must be string"
+                    },
+                    perDepenName:{
+                        bsonType: "string",
+                        maxLength: 250,
+                        description: "perDepenName must be string"
+                    },
+                    perDepenIDcard:{
+                        bsonType: ["null","string"],
+                        maxLength: 30,
+                        description: "perDepenIDcard must be string"
+                    },
+                    perDepenSI_Num:{
+                        bsonType: ["null","string"],
+                        maxLength: 30,
+                        description: "perDepenSI_Num must be string"
+                    },
+                    perDepenHI_Num:{
+                        bsonType: ["null","string"],
+                        maxLength: 30,
+                        description: "perDepenHI_Num must be string"
+                    },
+                    perDepenUI_Num:{
+                        bsonType: ["null","string"],
+                        maxLength: 30,
+                        description: "perDepenUI_Num must be string"
+                    },
+                    relateId:{
+                        bsonType: "string",
+                        //enum: checkExists[0],
+                        description: "relateId must be string"
+                    },
+                    fromdate:{
+                        bsonType: "date",  
+                        description: "fromdate must be string"
+                    },
+                    todate:{
+                        bsonType: "date",  
+                        description: "todate must be string"
+                    },
+                    note:{
+                        bsonType: ["null","string"],
+                        maxLength: 250,
+                        description: "employeeId must be string"
+                    }
+                }
+            }
+        }
+        break;
+    case "tblref_roles":
+        validateSchema = {
+            $jsonSchema:{
+                bsonType: "object",
+                required:["roleId","roleName","note"],
+                properties:{
+                    roleId:{
+                        bsonType: "string",
+                        maxLength: 10,
+                        description: "roleId must be string"
+                    },
+                    roleName:{
+                        bsonType: "string",
+                        maxLength: 250,
+                        description: "roleName must be string"
+                    },
+                    note:{
+                        bsonType: ["null","string"],
+                        maxLength: 250,
+                        description: "note must be string"
+                    }
+                }
+            }
+        };
+        break;
+        
     }
     return validateSchema;
 }

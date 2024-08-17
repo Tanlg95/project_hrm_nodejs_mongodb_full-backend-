@@ -3,40 +3,49 @@ const router = express.Router();
 
 const authToken = require('../databaseOperations/login/token/tokenFunction').authToken;
 
-const employeeCRUD = require('../databaseOperations/masterData/employeeCRUD');
-const departmentCRUD = require('../databaseOperations/department/departmentCRUD');
-const departmentFunction = require('../databaseOperations/department/departmentFunction');
-const positionCRUD = require('../databaseOperations/position/positionCRUD');
-const positionFunction = require('../databaseOperations/position/positionFunction');
-const contractionCRUD = require('../databaseOperations/contract/contractCRUD');
-const contracitonFunction = require('../databaseOperations/contract/contractFunction');
-const empTypeCRUD = require('../databaseOperations/emptype/emptypeCRUD');
-const empTypeFunction = require('../databaseOperations/emptype/emptypeFunction');
-const totalWdCRUD = require('../databaseOperations/timekeeping/totalWDCRUD');
-const totalWDFunction = require('../databaseOperations/timekeeping/totalWDFunction');
-const allowanceCRUD =  require('../databaseOperations/payroll/allowance/allowanceCRUD');
-const allowanceFunction = require('../databaseOperations/payroll/allowance/allowanceFunction');
-const allowanceFixCRUD = require('../databaseOperations/payroll/allowanceFix/allowanceFixCRUD');
-const allowanceFixFunction = require('../databaseOperations/payroll/allowanceFix/allowanceFixFunction');
-const salaryCRUD = require('../databaseOperations/payroll/salary/salaryCRUD');
-const salaryFunction = require('../databaseOperations/payroll/salary/salaryFunction');
-const addDeductCRUD = require('../databaseOperations/payroll/addDeduct/addDeductCRUD');
-const addDeductFunction = require('../databaseOperations/payroll/addDeduct/addDeductFunction');
-const payrollCRUD = require('../databaseOperations/payroll/payroll/payrollCRUD');
-const payrollFunction = require('../databaseOperations/payroll/payroll/payrollFunction');
-const parameterCRUD = require('../databaseOperations/payroll/parameter/payrollParameterCRUD');
-const parameterFunction = require('../databaseOperations/payroll/parameter/payrollParameterFunction');
-const accountCRUD = require('../databaseOperations/login/account/accountCRUD');
-const accountFunction = require('../databaseOperations/login/account/accountFunction');
+const listRouter = { 
+        employeeCRUD : require('../databaseOperations/masterData/employeeCRUD'),
+        departmentCRUD : require('../databaseOperations/department/departmentCRUD'),
+        departmentFunction : require('../databaseOperations/department/departmentFunction'),
+        positionCRUD : require('../databaseOperations/position/positionCRUD'),
+        positionFunction : require('../databaseOperations/position/positionFunction'),
+        contractionCRUD : require('../databaseOperations/contract/contractCRUD'),
+        contracitonFunction : require('../databaseOperations/contract/contractFunction'),
+        empTypeCRUD : require('../databaseOperations/emptype/emptypeCRUD'),
+        empTypeFunction : require('../databaseOperations/emptype/emptypeFunction'),
+        totalWdCRUD : require('../databaseOperations/timekeeping/totalWDCRUD'),
+        totalWDFunction : require('../databaseOperations/timekeeping/totalWDFunction'),
+        allowanceCRUD :  require('../databaseOperations/payroll/allowance/allowanceCRUD'),
+        allowanceFunction : require('../databaseOperations/payroll/allowance/allowanceFunction'),
+        allowanceFixCRUD : require('../databaseOperations/payroll/allowanceFix/allowanceFixCRUD'),
+        allowanceFixFunction : require('../databaseOperations/payroll/allowanceFix/allowanceFixFunction'),
+        salaryCRUD : require('../databaseOperations/payroll/salary/salaryCRUD'),
+        salaryFunction : require('../databaseOperations/payroll/salary/salaryFunction'),
+        addDeductCRUD : require('../databaseOperations/payroll/addDeduct/addDeductCRUD'),
+        addDeductFunction : require('../databaseOperations/payroll/addDeduct/addDeductFunction'),
+        payrollCRUD : require('../databaseOperations/payroll/payroll/payrollCRUD'),
+        payrollFunction : require('../databaseOperations/payroll/payroll/payrollFunction'),
+        parameterCRUD : require('../databaseOperations/payroll/parameter/payrollParameterCRUD'),
+        parameterFunction : require('../databaseOperations/payroll/parameter/payrollParameterFunction'),
+        accountCRUD : require('../databaseOperations/login/account/accountCRUD'),
+        accountFunction : require('../databaseOperations/login/account/accountFunction'),
+        relationCRUD : require('../databaseOperations/familyDepen/familyDepenCRUD'),
+        relationFunction : require('../databaseOperations/familyDepen/familyDepenFunction'),
+        emp7hCRUD: require('../databaseOperations/emp7h/emp7hCRUD'),
+        emp7hFunction: require('../databaseOperations/emp7h/emp7hFunction'),
+        roleCRUD: require('../databaseOperations/systems/role/roleCRUD'),
+        roleFunction: require('../databaseOperations/systems/role/roleFunction'),
+        collectionCURD: require('../databaseDDL/databaseDDL_CRUD'),
+};
 
 
 //---------------------- employee's router ------------------------// begin
 //#region 
 // get list employee's router
 
-router.get('/getEmployee/:empid',(req,res,next) =>{
+router.get('/api/employee/function/get/:empid',(req,res,next) =>{
     const empid = req.params.empid;
-    employeeCRUD.getemployee(empid).then(
+    listRouter.employeeCRUD.getemployee(empid).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -45,9 +54,9 @@ router.get('/getEmployee/:empid',(req,res,next) =>{
 
 // create employee's router
 
-router.post('/createEmployee',(req,res,next)=>{
-   
-    employeeCRUD.createEmployee(req).then(
+router.post('/api/employee/CRUD/C',(req,res,next)=>{
+
+    listRouter.employeeCRUD.createEmployee(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -56,9 +65,9 @@ router.post('/createEmployee',(req,res,next)=>{
 
 // update employee's router
 
-router.post('/updateEmployee',(req,res,next)=>{
+router.post('/api/employee/CRUD/U',(req,res,next)=>{
    
-    employeeCRUD.updateEmployee(req).then(
+    listRouter.employeeCRUD.updateEmployee(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -67,9 +76,9 @@ router.post('/updateEmployee',(req,res,next)=>{
 
 // delete employee's router
 
-router.post('/deleteEmployee',(req,res,next)=>{
+router.post('/api/employee/CRUD/D',(req,res,next)=>{
    
-    employeeCRUD.deleteEmployee(req).then(
+    listRouter.employeeCRUD.deleteEmployee(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -84,8 +93,8 @@ router.post('/deleteEmployee',(req,res,next)=>{
 
 // create deparment structure
 
-router.post('/createDepartmentStructure',(req,res,next) => {
-    departmentCRUD.createDepartmentStruct(req).then(
+router.post('/api/department/CRUD/C',(req,res,next) => {
+    listRouter.departmentCRUD.createDepartmentStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -94,8 +103,8 @@ router.post('/createDepartmentStructure',(req,res,next) => {
 
 // update deparment structure
 
-router.post('/updateDepartmentStructure',(req,res,next) => {
-    departmentCRUD.updateDepartmentStruct(req).then(
+router.post('/api/department/CRUD/U',(req,res,next) => {
+    listRouter.departmentCRUD.updateDepartmentStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -105,8 +114,8 @@ router.post('/updateDepartmentStructure',(req,res,next) => {
 
 // delete deparment structure
 
-router.post('/deleteDepartmentStructure',(req,res,next) => {
-    departmentCRUD.deleteDepartmentStruct(req).then(
+router.post('/api/department/CRUD/D',(req,res,next) => {
+    listRouter.departmentCRUD.deleteDepartmentStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -122,8 +131,8 @@ router.post('/deleteDepartmentStructure',(req,res,next) => {
 
 // create employee deparment 
 
-router.post('/createEmployeeDepartment',(req,res,next) => {
-    departmentCRUD.createEmployeeDepartment(req).then(
+router.post('/api/department/emp/CRUD/C',(req,res,next) => {
+    listRouter.departmentCRUD.createEmployeeDepartment(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -132,8 +141,8 @@ router.post('/createEmployeeDepartment',(req,res,next) => {
 
 // update employee deparment 
 
-router.post('/updateEmployeeDepartment',(req,res,next) => {
-    departmentCRUD.updateEmployeeDepartment(req).then(
+router.post('/api/department/emp/CRUD/U',(req,res,next) => {
+    listRouter.departmentCRUD.updateEmployeeDepartment(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -143,8 +152,8 @@ router.post('/updateEmployeeDepartment',(req,res,next) => {
 
 // delete employee deparment 
 
-router.post('/deleteEmployeeDepartment',(req,res,next) => {
-    departmentCRUD.deleteEmployeeDepartment(req).then(
+router.post('/api/department/emp/CRUD/D',(req,res,next) => {
+    listRouter.departmentCRUD.deleteEmployeeDepartment(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -153,9 +162,9 @@ router.post('/deleteEmployeeDepartment',(req,res,next) => {
 
 // get max department
 
-router.get('/getmaxdepartment/:todate',(req,res,next) =>{
+router.get('/api/department/emp/function/getMaxDep/:todate',(req,res,next) =>{
     const todate = req.params.todate;
-    departmentFunction.ufnGetMaxDep(todate).then(
+    listRouter.departmentFunction.ufnGetMaxDep(todate).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -164,9 +173,9 @@ router.get('/getmaxdepartment/:todate',(req,res,next) =>{
 
 // get list history change department
 
-router.get('/gethistorychangedep/:fromdate/:todate',(req,res,next) =>{
+router.get('/api/department/emp/function/getHisDep/:fromdate/:todate',(req,res,next) =>{
     const fromdate = req.params.fromdate, todate = req.params.todate;
-    departmentFunction.changeDepHistory(fromdate,todate).then(
+    listRouter.departmentFunction.changeDepHistory(fromdate,todate).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -182,8 +191,8 @@ router.get('/gethistorychangedep/:fromdate/:todate',(req,res,next) =>{
 //#region 
 
 // create position structure
-router.post('/createPositionStructure',(req,res,next) =>{
-    positionCRUD.createpositionStruct(req).then(
+router.post('/api/position/CRUD/C',(req,res,next) =>{
+    listRouter.positionCRUD.createpositionStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -191,8 +200,8 @@ router.post('/createPositionStructure',(req,res,next) =>{
 });
 
 // update position structure
-router.post('/updatePositionStructure',(req,res,next) =>{
-    positionCRUD.updatepositionStruct(req).then(
+router.post('/api/position/CRUD/U',(req,res,next) =>{
+    listRouter.positionCRUD.updatepositionStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -200,8 +209,8 @@ router.post('/updatePositionStructure',(req,res,next) =>{
 });
 
 // delete position structure
-router.post('/deletePositionStructure',(req,res,next) =>{
-    positionCRUD.deletepositionStruct(req).then(
+router.post('/api/position/CRUD/D',(req,res,next) =>{
+    listRouter.positionCRUD.deletepositionStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -216,8 +225,8 @@ router.post('/deletePositionStructure',(req,res,next) =>{
 //#region 
 
 // create employee's position
-router.post('/createEmployeePosition',(req,res,next) =>{
-    positionCRUD.createEmployeeposition(req).then(
+router.post('/api/position/emp/CRUD/C',(req,res,next) =>{
+    listRouter.positionCRUD.createEmployeeposition(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -225,8 +234,8 @@ router.post('/createEmployeePosition',(req,res,next) =>{
 });
 
 // update employee's position
-router.post('/updateEmployeePosition',(req,res,next) =>{
-    positionCRUD.updateEmployeeposition(req).then(
+router.post('/api/position/emp/CRUD/U',(req,res,next) =>{
+    listRouter.positionCRUD.updateEmployeeposition(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -234,8 +243,8 @@ router.post('/updateEmployeePosition',(req,res,next) =>{
 });
 
 // delete employee's position
-router.post('/deleteEmployeePosition',(req,res,next) =>{
-    positionCRUD.deleteEmployeeposition(req).then(
+router.post('/api/position/emp/CRUD/D',(req,res,next) =>{
+    listRouter.positionCRUD.deleteEmployeeposition(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -243,9 +252,9 @@ router.post('/deleteEmployeePosition',(req,res,next) =>{
 });
 
 // get max position
-router.get('/getmaxposition/:todate',(req,res,next) =>{
+router.get('/api/position/function/getMaxPos/:todate',(req,res,next) =>{
     const todate = req.params.todate;
-    positionFunction.ufnGetMaxPos(todate).then(
+    listRouter.positionFunction.ufnGetMaxPos(todate).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -253,9 +262,9 @@ router.get('/getmaxposition/:todate',(req,res,next) =>{
 });
 
 // get list history change position
-router.get('/gethistorychangepos/:fromdate/:todate',(req,res,next) =>{
+router.get('/api/position/function/getHisPos/:fromdate/:todate',(req,res,next) =>{
     const fromdate = req.params.fromdate, todate = req.params.todate;
-    positionFunction.changePosHistory(fromdate,todate).then(
+    listRouter.positionFunction.changePosHistory(fromdate,todate).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -270,8 +279,8 @@ router.get('/gethistorychangepos/:fromdate/:todate',(req,res,next) =>{
 //#region 
 
 // create contraction structure
-router.post('/createContractionStructure',(req,res,next) =>{
-    contractionCRUD.createcontractionStruct(req).then(
+router.post('/api/contract/CRUD/C',(req,res,next) =>{
+    listRouter.contractionCRUD.createcontractionStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -279,8 +288,8 @@ router.post('/createContractionStructure',(req,res,next) =>{
 });
 
 // update contraction structure
-router.post('/updateContractionStructure',(req,res,next) =>{
-    contractionCRUD.updatecontractionStruct(req).then(
+router.post('//api/contract/CRUD/U',(req,res,next) =>{
+    listRouter.contractionCRUD.updatecontractionStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -288,8 +297,8 @@ router.post('/updateContractionStructure',(req,res,next) =>{
 });
 
 // delete contraction structure
-router.post('/deleteContractionStructure',(req,res,next) =>{
-    contractionCRUD.deletecontractionStruct(req).then(
+router.post('/api/contract/CRUD/D',(req,res,next) =>{
+    listRouter.contractionCRUD.deletecontractionStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -304,8 +313,8 @@ router.post('/deleteContractionStructure',(req,res,next) =>{
 //#region 
 
 // create employee's contraction
-router.post('/createEmployeeContraction',(req,res,next) =>{
-    contractionCRUD.createEmployeecontraction(req).then(
+router.post('/api/contract/emp/CRUD/C',(req,res,next) =>{
+    listRouter.contractionCRUD.createEmployeecontraction(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -313,8 +322,8 @@ router.post('/createEmployeeContraction',(req,res,next) =>{
 });
 
 // update employee's contraction
-router.post('/updateEmployeeContraction',(req,res,next) =>{
-    contractionCRUD.updateEmployeecontraction(req).then(
+router.post('/api/contract/emp/CRUD/U',(req,res,next) =>{
+    listRouter.contractionCRUD.updateEmployeecontraction(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -322,8 +331,8 @@ router.post('/updateEmployeeContraction',(req,res,next) =>{
 });
 
 // delete employee's contraction
-router.post('/deleteEmployeeContraction',(req,res,next) =>{
-    contractionCRUD.deleteEmployeecontraction(req).then(
+router.post('/api/contract/emp/CRUD/D',(req,res,next) =>{
+    listRouter.contractionCRUD.deleteEmployeecontraction(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -331,9 +340,9 @@ router.post('/deleteEmployeeContraction',(req,res,next) =>{
 });
 
 // get max contraction
-router.get('/getmaxcontraction/:todate',(req,res,next) =>{
+router.get('/api/contract/function/getMaxContract/:todate',(req,res,next) =>{
     const todate = req.params.todate;
-    contracitonFunction.getmaxContract(todate).then(
+    listRouter.contracitonFunction.getmaxContract(todate).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -342,9 +351,9 @@ router.get('/getmaxcontraction/:todate',(req,res,next) =>{
 
 
 // renew contraction
-router.post('/renewContract/:fromdate/:todate/:contractTypeId',(req,res,next) =>{
+router.post('/api/contract/function/renewContract/:fromdate/:todate/:contractTypeId',(req,res,next) =>{
     const fromdate = req.params.fromdate, todate = req.params.todate, contractTypeId = req.params.contractTypeId ;
-    contracitonFunction.renewContract(fromdate,todate,contractTypeId).then(
+    listRouter.contracitonFunction.renewContract(fromdate,todate,contractTypeId).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -362,8 +371,8 @@ router.post('/renewContract/:fromdate/:todate/:contractTypeId',(req,res,next) =>
 //#region 
 
 // create emptype structure
-router.post('/createEmpTypeStructure',(req,res,next) =>{
-    empTypeCRUD.createtypeStruct(req).then(
+router.post('/api/empType/CRUD/C',(req,res,next) =>{
+    listRouter.empTypeCRUD.createtypeStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -371,8 +380,8 @@ router.post('/createEmpTypeStructure',(req,res,next) =>{
 });
 
 // update emptype structure
-router.post('/updateEmpTypeStructure',(req,res,next) =>{
-    empTypeCRUD.updatetypeStruct(req).then(
+router.post('/api/empType/CRUD/U',(req,res,next) =>{
+    listRouter.empTypeCRUD.updatetypeStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -380,8 +389,8 @@ router.post('/updateEmpTypeStructure',(req,res,next) =>{
 });
 
 // delete emptype structure
-router.post('/deleteEmpTypeStructure',(req,res,next) =>{
-    empTypeCRUD.deletetypeStruct(req).then(
+router.post('/api/empType/CRUD/D',(req,res,next) =>{
+    listRouter.empTypeCRUD.deletetypeStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -396,8 +405,8 @@ router.post('/deleteEmpTypeStructure',(req,res,next) =>{
 //#region 
 
 // create employee's type
-router.post('/createEmployeeType',(req,res,next) =>{
-    empTypeCRUD.createEmployeetype(req).then(
+router.post('/api/empType/emp/CRUD/C',(req,res,next) =>{
+    listRouter.empTypeCRUD.createEmployeetype(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -405,8 +414,8 @@ router.post('/createEmployeeType',(req,res,next) =>{
 });
 
 // update employee's type
-router.post('/updateEmployeeType',(req,res,next) =>{
-    empTypeCRUD.updateEmployeetype(req).then(
+router.post('/api/empType/emp/CRUD/U',(req,res,next) =>{
+    listRouter.empTypeCRUD.updateEmployeetype(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -414,8 +423,8 @@ router.post('/updateEmployeeType',(req,res,next) =>{
 });
 
 // delete employee's type
-router.post('/deleteEmployeeType',(req,res,next) =>{
-    empTypeCRUD.deleteEmployeetype(req).then(
+router.post('/api/empType/emp/CRUD/D',(req,res,next) =>{
+    listRouter.empTypeCRUD.deleteEmployeetype(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -423,9 +432,9 @@ router.post('/deleteEmployeeType',(req,res,next) =>{
 });
 
 // get max type
-router.get('/getmaxempType/:todate',(req,res,next) =>{
+router.get('/api/empType/function/getMaxEmpType/:todate',(req,res,next) =>{
     const todate = req.params.todate;
-    empTypeFunction.getmaxempType(todate).then(
+    listRouter.empTypeFunction.getmaxempType(todate).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -433,9 +442,9 @@ router.get('/getmaxempType/:todate',(req,res,next) =>{
 });
 
 // get total employee by each employee's type
-router.get('/gettotalempType/:todate',(req,res,next) =>{
+router.get('/api/empType/function/totalEmpType/:todate',(req,res,next) =>{
     const todate = req.params.todate;
-    empTypeFunction.totalEmployeeByEmpType(todate).then(
+    listRouter.empTypeFunction.totalEmployeeByEmpType(todate).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -451,8 +460,8 @@ router.get('/gettotalempType/:todate',(req,res,next) =>{
 //#region 
 
 // create totalWD
-router.post('/createTotalWD',(req,res,next) =>{
-    totalWdCRUD.createTotalWD (req).then(
+router.post('/api/totalWD/CRUD/C',(req,res,next) =>{
+    listRouter.totalWdCRUD.createTotalWD (req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -460,8 +469,8 @@ router.post('/createTotalWD',(req,res,next) =>{
 });
 
 // update totalWD
-router.post('/updateTotalWD',(req,res,next) =>{
-    totalWdCRUD.updateTotalWD(req).then(
+router.post('/api/totalWD/CRUD/U',(req,res,next) =>{
+    listRouter.totalWdCRUD.updateTotalWD(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -469,8 +478,8 @@ router.post('/updateTotalWD',(req,res,next) =>{
 });
 
 // delete totalWD
-router.post('/deleteTotalWD',(req,res,next) =>{
-    totalWdCRUD.deleteTotalWD(req).then(
+router.post('/api/totalWD/CRUD/D',(req,res,next) =>{
+    listRouter.totalWdCRUD.deleteTotalWD(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -478,9 +487,9 @@ router.post('/deleteTotalWD',(req,res,next) =>{
 });
 
 //get totalOT
-router.get('/getTotalOT/:monthid/:yearid',(req,res,next) =>{
+router.get('/api/totalWD/function/getTotalOT/:monthid/:yearid',(req,res,next) =>{
     const monthid = req.params.monthid, yearid = req.params.yearid;
-    totalWDFunction.getTotalOT(monthid,yearid).then(
+    listRouter.totalWDFunction.getTotalOT(monthid,yearid).then(
         dataRespone => res.json(dataRespone) 
     ).catch(
         err => next(err)
@@ -488,9 +497,9 @@ router.get('/getTotalOT/:monthid/:yearid',(req,res,next) =>{
 });
 
 //get totalLeave
-router.get('/getTotalLeave/:monthid/:yearid',(req,res,next) =>{
+router.get('/api/totalWD/function/getTotalLeave/:monthid/:yearid',(req,res,next) =>{
     const monthid = req.params.monthid, yearid = req.params.yearid;
-    totalWDFunction.getTotalLeave(monthid,yearid).then(
+    listRouter.totalWDFunction.getTotalLeave(monthid,yearid).then(
         dataRespone => res.json(dataRespone) 
     ).catch(
         err => next(err)
@@ -506,8 +515,8 @@ router.get('/getTotalLeave/:monthid/:yearid',(req,res,next) =>{
 //#region 
 
 // create allowance structure
-router.post('/createAllowanceStructure',(req,res,next) =>{
-    allowanceCRUD.createallowanceStruct(req).then(
+router.post('/api/allowance/CRUD/C',(req,res,next) =>{
+    listRouter.allowanceCRUD.createallowanceStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -515,8 +524,8 @@ router.post('/createAllowanceStructure',(req,res,next) =>{
 });
 
 // update allowance structure
-router.post('/updateAllowanceStructure',(req,res,next) =>{
-    allowanceCRUD.updateallowanceStruct(req).then(
+router.post('/api/allowance/CRUD/U',(req,res,next) =>{
+    listRouter.allowanceCRUD.updateallowanceStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -524,8 +533,8 @@ router.post('/updateAllowanceStructure',(req,res,next) =>{
 });
 
 // delete allowance structure
-router.post('/deleteAllowanceStructure',(req,res,next) =>{
-    allowanceCRUD.deleteallowanceStruct(req).then(
+router.post('/api/allowance/CRUD/D',(req,res,next) =>{
+    listRouter.allowanceCRUD.deleteallowanceStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -540,8 +549,8 @@ router.post('/deleteAllowanceStructure',(req,res,next) =>{
 //#region 
 
 // create employee's allowance
-router.post('/createEmployeeAllowance',(req,res,next) =>{
-    allowanceCRUD.createEmployeeallowance(req).then(
+router.post('/api/allowance/emp/CRUD/C',(req,res,next) =>{
+    listRouter.allowanceCRUD.createEmployeeallowance(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -549,8 +558,8 @@ router.post('/createEmployeeAllowance',(req,res,next) =>{
 });
 
 // update employee's allowance
-router.post('/updateEmployeeAllowance',(req,res,next) =>{
-    allowanceCRUD.updateEmployeeallowance(req).then(
+router.post('/api/allowance/emp/CRUD/U',(req,res,next) =>{
+    listRouter.allowanceCRUD.updateEmployeeallowance(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -558,8 +567,8 @@ router.post('/updateEmployeeAllowance',(req,res,next) =>{
 });
 
 // delete employee's allowance
-router.post('/deleteEmployeeAllowance',(req,res,next) =>{
-    allowanceCRUD.deleteEmployeeallowance(req).then(
+router.post('/api/allowance/emp/CRUD/D',(req,res,next) =>{
+    listRouter.allowanceCRUD.deleteEmployeeallowance(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -568,9 +577,9 @@ router.post('/deleteEmployeeAllowance',(req,res,next) =>{
 
 // get max allowance
 
-router.get('/getmaxAllowance/:todate',(req,res,next) =>{
+router.get('/api/allowance/function/getMaxAll/:todate',(req,res,next) =>{
     const todate = req.params.todate;
-    allowanceFunction.getmaxAllowane(todate).then(
+    listRouter.allowanceFunction.getmaxAllowane(todate).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -586,8 +595,8 @@ router.get('/getmaxAllowance/:todate',(req,res,next) =>{
 //#region 
 
 // create employee's allowanceFix
-router.post('/createEmployeeAllowanceFix',(req,res,next) =>{
-    allowanceFixCRUD.createEmployeeallowanceFix(req).then(
+router.post('/api/allowanceFix/emp/CRUD/C',(req,res,next) =>{
+    listRouter.allowanceFixCRUD.createEmployeeallowanceFix(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -595,8 +604,8 @@ router.post('/createEmployeeAllowanceFix',(req,res,next) =>{
 });
 
 // update employee's allowanceFix
-router.post('/updateEmployeeAllowanceFix',(req,res,next) =>{
-    allowanceFixCRUD.updateEmployeeallowanceFix(req).then(
+router.post('/api/allowanceFix/emp/CRUD/U',(req,res,next) =>{
+    listRouter.allowanceFixCRUD.updateEmployeeallowanceFix(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -604,8 +613,8 @@ router.post('/updateEmployeeAllowanceFix',(req,res,next) =>{
 });
 
 // delete employee's allowanceFix
-router.post('/deleteEmployeeAllowanceFix',(req,res,next) =>{
-    allowanceFixCRUD.deleteEmployeeallowanceFix(req).then(
+router.post('/api/allowanceFix/emp/CRUD/D',(req,res,next) =>{
+    listRouter.allowanceFixCRUD.deleteEmployeeallowanceFix(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -614,9 +623,9 @@ router.post('/deleteEmployeeAllowanceFix',(req,res,next) =>{
 
 // get max allowanceFix
 
-router.get('/getmaxAllowanceFix/:todate',(req,res,next) =>{
+router.get('/api/allowanceFix/function/getMaxAllFix/:todate',(req,res,next) =>{
     const todate = req.params.todate;
-    allowanceFixFunction.getmaxAllowaneFix(todate).then(
+    listRouter.allowanceFixFunction.getmaxAllowaneFix(todate).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -631,8 +640,8 @@ router.get('/getmaxAllowanceFix/:todate',(req,res,next) =>{
 //#region 
 
 // create employee's salary
-router.post('/createEmployeeSalary',(req,res,next) =>{
-    salaryCRUD.createsalary(req).then(
+router.post('/api/bsal/CRUD/C',(req,res,next) =>{
+    listRouter.salaryCRUD.createsalary(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -640,8 +649,8 @@ router.post('/createEmployeeSalary',(req,res,next) =>{
 });
 
 // update employee's salary
-router.post('/updateEmployeeSalary',(req,res,next) =>{
-    salaryCRUD.updatesalary(req).then(
+router.post('/api/bsal/CRUD/U',(req,res,next) =>{
+    listRouter.salaryCRUD.updatesalary(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -649,8 +658,8 @@ router.post('/updateEmployeeSalary',(req,res,next) =>{
 });
 
 // delete employee's salary
-router.post('/deleteEmployeeSalary',(req,res,next) =>{
-    salaryCRUD.deletesalary(req).then(
+router.post('/api/bsal/CRUD/D',(req,res,next) =>{
+    listRouter.salaryCRUD.deletesalary(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -659,9 +668,9 @@ router.post('/deleteEmployeeSalary',(req,res,next) =>{
 
 // get max salary
 
-router.get('/getmaxSalary/:todate',(req,res,next) =>{
+router.get('/api/bsal/function/getMaxbsal/:todate',(req,res,next) =>{
     const todate = req.params.todate;
-    salaryFunction.getmaxSalary(todate).then(
+    listRouter.salaryFunction.getmaxSalary(todate).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -677,27 +686,27 @@ router.get('/getmaxSalary/:todate',(req,res,next) =>{
 //---------------------- addDeduct structure  ------------------------// begin
 //#region 
 
-// create allowance addDeduct
-router.post('/createAddDeductStructure',(req,res,next) =>{
-    addDeductCRUD.createAddDeductStruct(req).then(
+// create addDeduct
+router.post('/api/addDeduct/CRUD/C',(req,res,next) =>{
+    listRouter.addDeductCRUD.createAddDeductStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
     );
 });
 
-// update allowance addDeduct
-router.post('/updateAddDeductStructure',(req,res,next) =>{
-    addDeductCRUD.updateAddDeductStruct(req).then(
+// update addDeduct
+router.post('/api/addDeduct/CRUD/U',(req,res,next) =>{
+    listRouter.addDeductCRUD.updateAddDeductStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
     );
 });
 
-// delete allowance addDeduct
-router.post('/deleteAddDeductStructure',(req,res,next) =>{
-    addDeductCRUD.deleteAddDeductStruct(req).then(
+// delete addDeduct
+router.post('/api/addDeduct/CRUD/D',(req,res,next) =>{
+    listRouter.addDeductCRUD.deleteAddDeductStruct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -712,8 +721,8 @@ router.post('/deleteAddDeductStructure',(req,res,next) =>{
 //#region 
 
 // create employee's addDeduct
-router.post('/createEmployeeaddDeduct',(req,res,next) =>{
-    addDeductCRUD.createEmployeeAddDeduct(req).then(
+router.post('/api/addDeduct/emp/CRUD/C',(req,res,next) =>{
+    listRouter.addDeductCRUD.createEmployeeAddDeduct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -721,8 +730,8 @@ router.post('/createEmployeeaddDeduct',(req,res,next) =>{
 });
 
 // update employee's addDeduct
-router.post('/updateEmployeeaddDeduct',(req,res,next) =>{
-    addDeductCRUD.updateEmployeeAddDeduct(req).then(
+router.post('/api/addDeduct/emp/CRUD/U',(req,res,next) =>{
+    listRouter.addDeductCRUD.updateEmployeeAddDeduct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -730,8 +739,8 @@ router.post('/updateEmployeeaddDeduct',(req,res,next) =>{
 });
 
 // delete employee's addDeduct
-router.post('/deleteEmployeeaddDeduct',(req,res,next) =>{
-    addDeductCRUD.deleteEmployeeAddDeduct(req).then(
+router.post('/api/addDeduct/emp/CRUD/D',(req,res,next) =>{
+    listRouter.addDeductCRUD.deleteEmployeeAddDeduct(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -740,9 +749,9 @@ router.post('/deleteEmployeeaddDeduct',(req,res,next) =>{
 
 // get max addDeduct
 
-router.get('/getmaxaddDeduct/:todate/:adopt',authToken,(req,res,next) =>{
+router.get('/api/addDeduct/function/getMaxaddDeduct/:todate/:adopt',authToken,(req,res,next) =>{
     const todate = req.params.todate, adopt = req.params.adopt;
-    addDeductFunction.getmaxaddDeduct(todate,adopt).then(
+    listRouter.addDeductFunction.getmaxaddDeduct(todate,adopt).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -758,8 +767,8 @@ router.get('/getmaxaddDeduct/:todate/:adopt',authToken,(req,res,next) =>{
 //#region 
 
 // create employee's payroll
-router.post('/createEmployeePayroll',(req,res,next) =>{
-    payrollCRUD.createpayroll(req).then(
+router.post('/api/payroll/CRUD/C',(req,res,next) =>{
+    listRouter.payrollCRUD.createpayroll(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -767,8 +776,8 @@ router.post('/createEmployeePayroll',(req,res,next) =>{
 });
 
 // update employee's payroll
-router.post('/updateEmployeePayroll',(req,res,next) =>{
-    payrollCRUD.updatepayroll(req).then(
+router.post('/api/payroll/CRUD/U',(req,res,next) =>{
+    listRouter.payrollCRUD.updatepayroll(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -776,8 +785,8 @@ router.post('/updateEmployeePayroll',(req,res,next) =>{
 });
 
 // delete employee's payroll
-router.post('/deleteEmployeePayroll',(req,res,next) =>{
-    payrollCRUD.deletepayroll(req).then(
+router.post('/api/payroll/CRUD/D',(req,res,next) =>{
+    listRouter.payrollCRUD.deletepayroll(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -786,9 +795,9 @@ router.post('/deleteEmployeePayroll',(req,res,next) =>{
 
 // call payroll
 
-router.post('/calpayroll/:yearid/:monthid',(req,res,next) =>{
+router.post('/api/payroll/function/cal/:yearid/:monthid',(req,res,next) =>{
     const yearid = req.params.yearid, monthid = req.params.monthid;
-    payrollFunction.callPayroll(monthid,yearid,'').then(
+    listRouter.payrollFunction.callPayroll(monthid,yearid,'').then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -797,12 +806,12 @@ router.post('/calpayroll/:yearid/:monthid',(req,res,next) =>{
 
 // get payroll
 
-router.get('/getpayroll/:yearid/:monthid/:employeeid',(req,res,next) =>{
+router.get('/api/payroll/function/get/:yearid/:monthid/:employeeid',(req,res,next) =>{
 
     const yearid = req.params.yearid,
           monthid = req.params.monthid,
           employeeid = req.params.employeeid;
-    payrollFunction.getPayroll(yearid,monthid,employeeid).then(
+    listRouter.payrollFunction.getPayroll(yearid,monthid,employeeid).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -818,8 +827,8 @@ router.get('/getpayroll/:yearid/:monthid/:employeeid',(req,res,next) =>{
 //#region 
 
 // create employee's payroll
-router.post('/createParameter',(req,res,next) =>{
-    parameterCRUD.createparameter(req).then(
+router.post('/api/para/CRUD/C',(req,res,next) =>{
+    listRouter.parameterCRUD.createparameter(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -827,8 +836,8 @@ router.post('/createParameter',(req,res,next) =>{
 });
 
 // update employee's payroll
-router.post('/updateParameter',(req,res,next) =>{
-    parameterCRUD.updateparameter(req).then(
+router.post('/api/para/CRUD/U',(req,res,next) =>{
+    listRouter.parameterCRUD.updateparameter(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -836,8 +845,8 @@ router.post('/updateParameter',(req,res,next) =>{
 });
 
 // delete employee's payroll
-router.post('/deleteParameter',(req,res,next) =>{
-    parameterCRUD.deleteparameter(req).then(
+router.post('/api/para/CRUD/D',(req,res,next) =>{
+    listRouter.parameterCRUD.deleteparameter(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -846,9 +855,9 @@ router.post('/deleteParameter',(req,res,next) =>{
 
 // get list parameter
 
-router.get('/getListParameter',(req,res,next) =>{
+router.get('/api/para/function/get',(req,res,next) =>{
 
-    parameterFunction.getListparameter().then(
+    listRouter.parameterFunction.getListparameter().then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -865,9 +874,9 @@ router.get('/getListParameter',(req,res,next) =>{
 //#region 
 
 // register account
-router.post('/registerAccount',(req,res,next) =>{
+router.post('/api/acc/CRUD/C',(req,res,next) =>{
     
-    accountCRUD.registerAccount(req).then(
+    listRouter.accountCRUD.registerAccount(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -875,9 +884,9 @@ router.post('/registerAccount',(req,res,next) =>{
 });
 
 // update account
-router.post('/updateAccount',authToken,(req,res,next) =>{
+router.post('/api/acc/CRUD/U',authToken,(req,res,next) =>{
     
-    accountCRUD.updateAccount(req).then(
+    listRouter.accountCRUD.updateAccount(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -885,9 +894,9 @@ router.post('/updateAccount',authToken,(req,res,next) =>{
 });
 
 // delete account
-router.post('/deleteAccount',authToken,(req,res,next) =>{
+router.post('/api/acc/CRUD/D',authToken,(req,res,next) =>{
     
-    accountCRUD.deleteAccount(req).then(
+    listRouter.accountCRUD.deleteAccount(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -895,9 +904,9 @@ router.post('/deleteAccount',authToken,(req,res,next) =>{
 });
 
 // update password
-router.post('/updatePassword',authToken,(req,res,next) =>{
+router.post('/api/acc/pass/CRUD/U',authToken,(req,res,next) =>{
 
-    accountCRUD.updatePassword(req).then(
+    listRouter.accountCRUD.updatePassword(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -905,9 +914,9 @@ router.post('/updatePassword',authToken,(req,res,next) =>{
 });
 
 // update access token
-router.post('/updateToken',(req,res,next) => {
+router.post('/api/acc/token/at/CRUD/U',(req,res,next) => {
 
-    accountCRUD.updateAccessToken(req).then(
+    listRouter.accountCRUD.updateAccessToken(req).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -915,9 +924,10 @@ router.post('/updateToken',(req,res,next) => {
 });
 
 // login
-router.get('/login',(req,res,next) =>{
-    const body = {...req.body};
-    accountFunction.login(body).then(
+router.get('/api/acc/function/login/:accountId',(req,res,next) =>{
+    // const body = {...req.body};
+    const accountId = req.params.accountId;
+    listRouter.accountFunction.login(accountId).then(
         dataRespone => res.json(dataRespone)
     ).catch(
         err => next(err)
@@ -926,4 +936,286 @@ router.get('/login',(req,res,next) =>{
 
 //#endregion
 //---------------------- account ------------------------// end
+
+
+
+//---------------------- relation structure  ------------------------// begin
+//#region 
+
+// create relation structure
+router.post('/api/relation/CRUD/C',(req,res,next) =>{
+    listRouter.relationCRUD.createRelateStruct(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+});
+
+// update relation structure
+router.post('/api/relation/CRUD/U',(req,res,next) =>{
+    listRouter.relationCRUD.updateRelateStruct(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+});
+
+// delete relation structure
+router.post('/api/relation/CRUD/D',(req,res,next) =>{
+    listRouter.relationCRUD.deleteRelateStruct(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+});
+
+//#endregion
+//---------------------- relation structure  ------------------------// end
+
+
+//---------------------- family dependent  ------------------------// begin
+//#region 
+
+// create family dependent
+router.post('/api/relation/emp/CRUD/C',(req,res,next) =>{
+    listRouter.relationCRUD.createFamilyDepen(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+});
+
+// update family dependent
+router.post('/api/relation/emp/CRUD/U',(req,res,next) =>{
+    listRouter.relationCRUD.updateFamilyDepen(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+});
+
+// delete family dependent
+router.post('/api/relation/emp/CRUD/D',(req,res,next) =>{
+    listRouter.relationCRUD.deleteFamilyDepen(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+});
+
+// get total depend family
+
+router.get('/api/relation/function/getTotalDepend/:todate',(req,res,next) => {
+    const todate = req.params.todate;
+    listRouter.relationFunction.getmaxDepenFamily(todate).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+});
+
+// get detail depend family
+
+router.get('/api/relation/function/get/:todate',(req,res,next) => {
+    const todate = req.params.todate;
+    listRouter.relationFunction.getDetailDepenFamily(todate).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+});
+
+//#endregion
+
+
+//---------------------- tblemp7h ------------------------------// begin
+//#region 
+
+// create tblemp7h
+
+router.post('/api/emp7h/emp/CRUD/C',(req,res,next) => {
+    listRouter.emp7hCRUD.createEmp7h(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    )
+});
+
+//#endregion
+//---------------------- tblemp7h ------------------------------// end
+
+
+//---------------------- role's structure  ------------------------// begin
+//#region 
+
+router.post('/api/roles/CRUD/C',(req,res,next) => {
+    
+    listRouter.roleCRUD.createRoleStructure(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+})
+
+
+//#endregion
+//---------------------- role's structure  ------------------------// end
+
+
+//---------------------- collection  ------------------------// begin
+//#region 
+
+// employee
+router.post('/api/coll/tblemployee',(req,res,next) => {
+    
+    listRouter.collectionCURD.createStuctEmployee().then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+})
+
+// position
+router.post('/api/coll/tblpos',(req,res,next) => {
+    
+    listRouter.collectionCURD.createStuctPos(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+})
+
+// department
+router.post('/api/coll/tbldep',(req,res,next) => {
+    
+    listRouter.collectionCURD.createStuctDep(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+})
+
+// emptype
+router.post('/api/coll/tblemptype',(req,res,next) => {
+    
+    listRouter.collectionCURD.createStuctEmpType(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+})
+
+// constract
+router.post('/api/coll/tblempcontract',(req,res,next) => {
+    
+    listRouter.collectionCURD.createStuctEmpContract(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+})
+
+// allowance
+router.post('/api/coll/tblempallowance',(req,res,next) => {
+    
+    listRouter.collectionCURD.createStuctEmpAllowance(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+})
+
+// allowance Fix
+router.post('/api/coll/tblempallowancefix',(req,res,next) => {
+    
+    listRouter.collectionCURD.createStuctEmpAllowanceFix(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+})
+
+// add / deduct
+router.post('/api/coll/tblempad',(req,res,next) => {
+    
+    listRouter.collectionCURD.createStuctEmpAD(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+})
+
+// basic salary
+router.post('/api/coll/tblempsal',(req,res,next) => {
+    
+    listRouter.collectionCURD.createStuctEmpSal(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+})
+
+// payroll
+router.post('/api/coll/tblpayroll',(req,res,next) => {
+    
+    listRouter.collectionCURD.createStuctEmpSal(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+})
+
+// parameter
+router.post('/api/coll/tblpara',(req,res,next) => {
+    
+    listRouter.collectionCURD.createStuctEmpSal(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+})
+
+// account
+router.post('/api/coll/tblaccount',(req,res,next) => {
+    
+    listRouter.collectionCURD.createStuctAccount(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+})
+
+// family
+router.post('/api/coll/tblfamily',(req,res,next) => {
+    
+    listRouter.collectionCURD.createStuctFamily(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+})
+
+// role
+router.post('/api/coll/tblrole',(req,res,next) => {
+    
+    listRouter.collectionCURD.createStuctRole(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+})
+
+// total work days
+router.post('/api/coll/tblwd',(req,res,next) => {
+    
+    listRouter.collectionCURD.createStuctRole(req).then(
+        dataRespone => res.json(dataRespone)
+    ).catch(
+        err => next(err)
+    );
+})
+
+//#endregion
+//------------------------ collection  ------------------------// end
+
 module.exports = router;

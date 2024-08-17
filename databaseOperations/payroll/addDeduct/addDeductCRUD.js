@@ -32,29 +32,29 @@ async function createAddDeductStruct(body)
     if(!(dataClient  instanceof Array)) throw statusRequest(0).message;
     let listDataForInsert = dataClient.filter((ele) => (checkExists.includes(ele.addDeductId))? false : true);
     const listDataForvalidateEmpAddDeduct = ([...listDataForInsert].map(eleInner => eleInner.addDeductId)).concat(checkExists);
-    try {
-        await db.createCollection(tblname_ref,{
-            validator: {...validateSupport(tblname_ref,null)}
-        });
-    } catch (error) {
-        await db.command({
-            collMod: tblname_ref,
-            validator: {...validateSupport(tblname_ref,null)}
-        })
-    }
-    try {
-        await db.createCollection(tblname_empall,{
-            validator: {...validateSupport(tblname_empall,listDataForvalidateEmpAddDeduct)}
-        });
-    } catch (error) {
-        await db.command({
-            collMod: tblname_empall,
-            validator: {...validateSupport(tblname_empall,listDataForvalidateEmpAddDeduct)}
-        })
-    }
+    // try {
+    //     await db.createCollection(tblname_ref,{
+    //         validator: {...validateSupport(tblname_ref,null)}
+    //     });
+    // } catch (error) {
+    //     await db.command({
+    //         collMod: tblname_ref,
+    //         validator: {...validateSupport(tblname_ref,null)}
+    //     })
+    // }
+    // try {
+    //     await db.createCollection(tblname_empall,{
+    //         validator: {...validateSupport(tblname_empall,listDataForvalidateEmpAddDeduct)}
+    //     });
+    // } catch (error) {
+    //     await db.command({
+    //         collMod: tblname_empall,
+    //         validator: {...validateSupport(tblname_empall,listDataForvalidateEmpAddDeduct)}
+    //     })
+    // }
     
-    await collref_AddDeduct.createIndexes([{key:{addDeductId:1},name:"idx_refempAddDeduct_addDeductId"}]);
-    await colltblempAddDeduct.createIndexes([{key:{employeeId:1,dateChange:-1, addDeductId: 1},name:"idx_empAddDeduct_employeeId_dateChange_addDeductId"}]);
+    // await collref_AddDeduct.createIndexes([{key:{addDeductId:1},name:"idx_refempAddDeduct_addDeductId"}]);
+    // await colltblempAddDeduct.createIndexes([{key:{employeeId:1,dateChange:-1, addDeductId: 1},name:"idx_empAddDeduct_employeeId_dateChange_addDeductId"}]);
 
     try {
    
@@ -158,10 +158,10 @@ async function deleteAddDeductStruct(body)
     //console.log(validateSchemaref_empAddDeductList);
     const validateSchemaAll = {...validateSupport(tblname_empad,validateSchemaAdArr)};
 
-    await db.command({
-        collMod: tblname_empad,
-        validator: validateSchemaAll
-    });
+    // await db.command({
+    //     collMod: tblname_empad,
+    //     validator: validateSchemaAll
+    // });
 
     if(dataClientFilter.length === 0) return status(0,2);
     for(let ele of dataClientFilter)
@@ -204,17 +204,17 @@ async function createEmployeeAddDeduct(body)
 
     const getlistref_AddDeduct = await collref_AddDeduct.distinct("addDeductId");
     const validateSchema = {...validateSupport(tblname_empadd,getlistref_AddDeduct)};
-    try {
-        await db.createCollection(tblname_empadd,{
-            validator: validateSchema
-        });
-    } catch (error) {
-        //console.log(error);
-        await db.command({
-            collMod: tblname_empadd,
-            validator: validateSchema
-        })
-    };
+    // try {
+    //     await db.createCollection(tblname_empadd,{
+    //         validator: validateSchema
+    //     });
+    // } catch (error) {
+    //     //console.log(error);
+    //     await db.command({
+    //         collMod: tblname_empadd,
+    //         validator: validateSchema
+    //     })
+    // };
     
     try {
     const dataClient = body.body;
